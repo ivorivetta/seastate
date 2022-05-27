@@ -1,0 +1,2 @@
+class OceanSDKException(Exception):
+    pass
