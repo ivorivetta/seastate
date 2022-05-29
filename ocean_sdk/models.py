@@ -1,17 +1,21 @@
+from dataclasses import dataclass
 from typing import List, Dict
 
+@dataclass
 class JsonResult:
-    def __init__(self, status_code: int, message: str = '', data: List[Dict] = None):
-        """Simplified requests.Response returned from RestAdapter
+    """Simplified requests.Response returned from RestAdapter
 
-        Args:
-            status_code (int): HTTP Status
-            message (str, optional): Human redable result. Defaults to ''.
-            data (List[Dict], optional): Pyrhon list of Dicts. Defaults to None.
-        """
-        self.status_code = int(status_code)
-        self.message = str(message)
-        self.data = data if data else []
+    Args:
+        status_code (int): HTTP Status
+        message (str, optional): Human redable result. Defaults to ''.
+        data (List[Dict], optional): Pyrhon list of Dicts. Defaults to None.
+    """
+    status_code: int
+    message: str = ''
+    data: List[Dict] = None
+    
+    def __post__init__(self, data):
+        self.data = data if data else [] #init data if dne
 
 
 class Prediction:

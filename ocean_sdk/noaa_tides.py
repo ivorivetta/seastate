@@ -32,7 +32,3 @@ if __name__ == '__main__':
     tideapi = TideApi()
     result = tideapi.get_hourly_json()
     print(result)
-    print(result.data)
-    print(type(result.data))
-    import pdb
-    pdb.set_trace()
