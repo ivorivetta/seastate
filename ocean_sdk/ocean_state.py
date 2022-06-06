@@ -14,6 +14,14 @@ class OceanState:
         self.tide_station_nearest = nearest_station('tide', self.lat, self.lon)
         
     def get_hourly(self, start: datetime = None, end: datetime = None):
+        if start and end: # all values provided, all good
+            pass
+        elif start and not end: # no end provided, return same day as start
+            end = start
+        elif not start and not end: # nothing provided, return today
+            start = datetime.today()
+            end = datetime.today()
+            
         tide = self._tide_api.get_hourly(self.tide_station_nearest, start, end)
         return tide
 

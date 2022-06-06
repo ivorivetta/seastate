@@ -13,13 +13,6 @@ class TideApi:
         self._rest_adapter = RestAdapter(hostname, api_key, ver, ssl_verify, logger)
         
     def get_hourly(self, station:str, start:datetime = None, end: datetime = None, endpoint: str = endpoint) -> Result:
-        if start and end: # all values provided, all good
-            pass
-        elif start and not end: # no end provided, return same day as start
-            end = start
-        elif not start and not end: # nothing provided, return today
-            start = datetime.today()
-            end = datetime.today()
             
         begin_date = f"{start.year}{start.month:02}{start.day:02}"
         end_date = f"{end.year}{end.month:02}{end.day:02}"
