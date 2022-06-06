@@ -21,8 +21,8 @@ class TideApi:
             start = datetime.today()
             end = datetime.today()
             
-        begin_date = f"{start.year}{start.month}{start.day}"
-        end_date = f"{end.year}{end.month}{end.day}"
+        begin_date = f"{start.year}{start.month:02}{start.day:02}"
+        end_date = f"{end.year}{end.month:02}{end.day:02}"
         
         ep_params = {
             'begin_date': begin_date,

@@ -19,8 +19,8 @@ class OceanState:
 
 if __name__ == '__main__':
     test = OceanState(32,-117)
-    # result = test.get_hourly()
-    # print(result)
-    # import pdb
-    # pdb.set_trace()
+    result = test.get_hourly()
+    print(result)
+    import pdb
+    pdb.set_trace()
         
