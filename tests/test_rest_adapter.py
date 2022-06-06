@@ -1,6 +1,6 @@
 from unittest import TestCase, mock
 from ocean_sdk.rest_adapter import RestAdapter
-from ocean_sdk.models import *
+from ocean_sdk.models import Result
 from ocean_sdk.exceptions import OceanSDKException
 import requests
 
@@ -15,7 +15,7 @@ class TestRestAdapter(TestCase):
         self.response._content = "{}".encode()
         with mock.patch("requests.request", return_value=self.response):
             result = self.rest_adapter._do('GET', '')
-            self.assertIsInstance(result, JsonResult)
+            self.assertIsInstance(result, Result)
     
     def test__do_bad_json_raises_oceansdkexception(self):
         bad_json = '{"bad json": '

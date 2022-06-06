@@ -1,20 +1,33 @@
 import logging
 from rest_adapter import RestAdapter
 from exceptions import OceanSDKException
-from models import *
+from models import Result
+from datetime import datetime
 
 class TideApi:
     baseurl = 'api.tidesandcurrents.noaa.gov/'
-    ep = 'api/prod/datagetter?'
+    endpoint = 'api/prod/datagetter?'
     
     def __init__(self, hostname: str = baseurl, api_key: str = '', ver: str = 'v1', ssl_verify: bool = True, logger: logging.Logger = None):
+        self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter(hostname, api_key, ver, ssl_verify, logger)
         
-    def get_hourly_json(self, ep: str = ep) -> JsonResult:
+    def get_hourly(self, station:str, start:datetime = None, end: datetime = None, endpoint: str = endpoint) -> Result:
+        if start and end: # all values provided, all good
+            pass
+        elif start and not end: # no end provided, return same day as start
+            end = start
+        elif not start and not end: # nothing provided, return today
+            start = datetime.today()
+            end = datetime.today()
+            
+        begin_date = f"{start.year}{start.month}{start.day}"
+        end_date = f"{end.year}{end.month}{end.day}"
+        
         ep_params = {
-            'begin_date': '20220528',
-            'end_date': '20220528',
-            'station': '9410230',
+            'begin_date': begin_date,
+            'end_date': end_date,
+            'station': str(station),
             'product': 'predictions',
             'interval': 'h',
             'datum': 'MTL',
@@ -23,12 +36,19 @@ class TideApi:
             'application': 'ocean_sdk',
             'format': 'json',
         }
-        result = self._rest_adapter.get(endpoint=ep,ep_params=ep_params)
-        json = JsonResult(status_code=result.status_code, message = result.message, data=result.data)
+        result = self._rest_adapter.get(endpoint=endpoint,ep_params=ep_params)
+        try:
+            data = result.data['predictions']
+        except (KeyError) as e:
+            self._logger.error(result.data)
+            raise OceanSDKException("TideApi unpacking error") from e
+        json = Result(status_code=result.status_code, message = result.message, data=data)
         return json
+
         
-    
 if __name__ == '__main__':
     tideapi = TideApi()
-    result = tideapi.get_hourly_json()
+    result = tideapi.get_hourly()
     print(result)
+    import pdb
+    pdb.set_trace()

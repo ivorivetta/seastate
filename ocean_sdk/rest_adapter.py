@@ -4,7 +4,7 @@ import requests.packages
 from typing import List, Dict
 from json import JSONDecodeError
 from exceptions import OceanSDKException
-from models import JsonResult
+from models import Result
 
 logging.basicConfig(level=logging.DEBUG)
         
@@ -14,7 +14,7 @@ class RestAdapter:
 
         Args:
             hostname (str): hostname for http request
-            api_key (str, optional): todo. Defaults to ''.
+            api_key (str, optional): Defaults to ''.
             ver (str, optional): Defaults to 'v1'.
             ssl_verify (bool, optional): Defaults to True.
             logger (logging.Logger, optional): Pass explictly else will be created with __name__.
@@ -26,7 +26,7 @@ class RestAdapter:
         if not ssl_verify:
             requests.packages.urllib3.disable_warnings()
             
-    def _do(self, http_method, endpoint:str, ep_params: Dict = None, data: Dict = None ) -> JsonResult:
+    def _do(self, http_method, endpoint:str, ep_params: Dict = None, data: Dict = None ) -> Result:
         full_url = self.url + endpoint
         headers = {'x-api-key': self._api_key}
         log_line_pre = f"method={http_method}, url={full_url}, params={ep_params}"
@@ -45,7 +45,7 @@ class RestAdapter:
         except requests.exceptions.RequestException as e:
             self._logger.error(msg=str(e))
             raise OceanSDKException("Request Failed") from e
-        # Parse JSON ouput to Python object or return failed JsonResult on exception
+        # Parse JSON ouput to Python object or return failed Result on exception
         try:
             data_out = response.json()
         except (ValueError, JSONDecodeError) as e:
@@ -53,15 +53,15 @@ class RestAdapter:
             raise OceanSDKException("Bad JSON in Response") from e
         is_success = 299 >= response.status_code >= 200
         log_line = log_line_post.format(is_success, response.status_code, response.reason)
-        # if status code in 200-299 range, return JsonResult, else raise exception
+        # if status code in 200-299 range, return Result, else raise exception
         if is_success:
             self._logger.debug(msg=log_line)
-            return JsonResult(response.status_code, message=response.reason, data=data_out)
+            return Result(response.status_code, message=response.reason, data=data_out)
         self._logger.error(msg=log_line)
         raise OceanSDKException(f"{response.status_code}: {response.reason}")
 
 
-    def get(self, endpoint: str, ep_params: Dict = None) -> JsonResult:
+    def get(self, endpoint: str, ep_params: Dict = None) -> Result:
         """GET method for RestAdapter
 
         Args:
@@ -69,7 +69,7 @@ class RestAdapter:
             ep_params (Dict, optional): key:value API parameters. Defaults to None.
 
         Returns:
-            JsonResult: Simplified Response object with:
+            Result: Simplified Response object with:
                 status_code
                 message
                 data
