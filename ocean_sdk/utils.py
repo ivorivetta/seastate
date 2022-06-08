@@ -1,34 +1,61 @@
 import numpy as np
 from typing import List
 
-def haversine(lat1: float, lon1: float, lat2: float, lon2: float):
-    """
-    Calculate the great circle distance between two points
-    on the earth (specified in decimal degrees)   
+from ocean_sdk.exceptions import OceanSDKException
 
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """ Returns distance in km using haversine method
+
+    Args:
+        lat1 (float): Coordinate in decimal degrees
+        lon1 (float): Coordinate in decimal degrees
+        lat2 (float): Coordinate in decimal degrees
+        lon2 (float): Coordinate in decimal degrees
+
+    Returns:
+        float: Returns great circle distance in km
     """
+    # Convert degrees to radians
     lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
 
+    # Calculate deltas
     dlat = lat2 - lat1
     dlon = lon2 - lon1
 
+    # Haversine method for measuring distance on a sphere
     a = np.sin(dlat/2.0)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2.0)**2
-
     c = 2 * np.arcsin(np.sqrt(a))
+    
     km = 6367 * c
     return km
 
 def nearest_station(category: str, lat: float, lon: float) -> str:
-    if 'tide' in category:
-        stations = noaa_tide_stations
-    else:
-        pass
+    """Returns nearest station from list
 
-    min = float('inf')
-    min_key = ''
+    Args:
+        category (str): Measurement category for switching data source
+            [tide]
+        lat (float): Coordinate in decimal degrees
+        lon (float): Coordinate in decimal degrees
+
+    Raises:
+        KeyError: _description_
+        
+    Returns:
+        str: Unique station ID
+    """
+    # Select measurement category and return dict of stations
+    try:
+        if 'tide' in category.lower():
+            stations = noaa_tide_stations
+        else:
+            pass
+    except (KeyError) as e:
+        raise OceanSDKException("No Category found") from e
+
+    # Find station closest to input coordinates using haversine
+    min = float('inf') # Initialize minimum pointer
     for k,v in stations.items():
-        # import pdb
-        # pdb.set_trace()
         new_val = haversine(lat, lon, v['lat'], v['lon'])
         if new_val < min:
             min = new_val

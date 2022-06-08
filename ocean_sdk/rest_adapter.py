@@ -5,8 +5,6 @@ from typing import List, Dict
 from json import JSONDecodeError
 from exceptions import OceanSDKException
 from models import Result
-
-logging.basicConfig(level=logging.DEBUG)
         
 class RestAdapter:
     def __init__(self, hostname: str, api_key: str = '', ver: str = 'v1', ssl_verify: bool = True, logger: logging.Logger = None):
@@ -27,6 +25,25 @@ class RestAdapter:
             requests.packages.urllib3.disable_warnings()
             
     def _do(self, http_method, endpoint:str, ep_params: Dict = None, data: Dict = None ) -> Result:
+        """HTTP request contructor convenience method
+
+        Args:
+            http_method (_type_): GET, POST, DELETE
+            endpoint (str): target endpoint
+            ep_params (Dict, optional): http parameters. Defaults to None.
+            data (Dict, optional): POST data. Defaults to None.
+
+        Raises:
+            OceanSDKException: _description_
+            OceanSDKException: _description_
+            OceanSDKException: _description_
+
+        Returns:
+            Result: Simplified http.Response object with:
+                status_code
+                message
+                data
+        """
         full_url = self.url + endpoint
         headers = {'x-api-key': self._api_key}
         log_line_pre = f"method={http_method}, url={full_url}, params={ep_params}"

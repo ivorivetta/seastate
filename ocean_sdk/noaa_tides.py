@@ -9,10 +9,33 @@ class TideApi:
     endpoint = 'api/prod/datagetter?'
     
     def __init__(self, hostname: str = baseurl, api_key: str = '', ver: str = 'v1', ssl_verify: bool = True, logger: logging.Logger = None):
+        """Constructor for TideApi, composed with RestAdapter 
+
+        Args:
+            hostname (str, optional): Set to api.tidesandcurrents.noaa.gov.
+            api_key (str, optional): Not used. Defaults to ''.
+            ver (str, optional): Defaults to 'v1'.
+            ssl_verify (bool, optional): Defaults to True.
+            logger (logging.Logger, optional): Pass explictly else will be created with __name__.
+        """
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter(hostname, api_key, ver, ssl_verify, logger)
         
     def get_hourly(self, station:str, start:datetime = None, end: datetime = None, endpoint: str = endpoint) -> Result:
+        """_summary_
+
+        Args:
+            station (str): _description_
+            start (datetime, optional): _description_. Defaults to None.
+            end (datetime, optional): _description_. Defaults to None.
+            endpoint (str, optional): _description_. Defaults to endpoint.
+
+        Raises:
+            OceanSDKException: _description_
+
+        Returns:
+            Result: _description_
+        """
             
         begin_date = f"{start.year}{start.month:02}{start.day:02}"
         end_date = f"{end.year}{end.month:02}{end.day:02}"
