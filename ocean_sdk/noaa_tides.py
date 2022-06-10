@@ -21,14 +21,14 @@ class TideApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter(hostname, api_key, ver, ssl_verify, logger)
         
-    def get_hourly(self, station:str, start:datetime = None, end: datetime = None, endpoint: str = endpoint) -> Result:
-        """_summary_
+    def get_hourly(self, station:str, start:datetime, end: datetime, endpoint: str = endpoint) -> Result:
+        """Returns Result for stationID and datetime start and end
 
         Args:
-            station (str): _description_
-            start (datetime, optional): _description_. Defaults to None.
-            end (datetime, optional): _description_. Defaults to None.
-            endpoint (str, optional): _description_. Defaults to endpoint.
+            station (str): Station ID.
+            start (datetime): start datetime.
+            end (datetime): end datetime.
+            endpoint (str, optional): Defaults to endpoint.
 
         Raises:
             OceanSDKException: _description_
@@ -52,14 +52,18 @@ class TideApi:
             'application': 'ocean_sdk',
             'format': 'json',
         }
+        
+        # Call endpoint
         result = self._rest_adapter.get(endpoint=endpoint,ep_params=ep_params)
+        
+        # unpack
         try:
             data = result.data['predictions']
         except (KeyError) as e:
             self._logger.error(result.data)
             raise OceanSDKException("TideApi unpacking error") from e
-        json = Result(status_code=result.status_code, message = result.message, data=data)
-        return json
+        result = Result(status_code=result.status_code, message = result.message, data=data)
+        return result
 
         
 if __name__ == '__main__':
