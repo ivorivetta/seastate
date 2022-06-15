@@ -1,7 +1,7 @@
 import numpy as np
-from typing import List
+# from typing import List
 
-from ocean_sdk.exceptions import OceanSDKException
+from exceptions import OceanSDKException
 
 def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """ Returns distance in km using haversine method
@@ -54,9 +54,11 @@ def nearest_station(category: str, lat: float, lon: float) -> str:
         raise OceanSDKException("No Category found") from e
 
     # Find station closest to input coordinates using haversine
+    # and is also active for water level
     min = float('inf') # Initialize minimum pointer
     for k,v in stations.items():
         new_val = haversine(lat, lon, v['lat'], v['lon'])
+        # todo: AND is active
         if new_val < min:
             min = new_val
             min_key = k

@@ -33,7 +33,7 @@ class OceanState:
         
         # Get data
         # todo: if status_code is good, return
-        tide = self._tide_api.get_hourly(self.tide_station_nearest, start, end)
+        tide = self._tide_api.tides_hourly(self.tide_station_nearest, start, end)
         return tide
     
     def get_hourly_df(self, start: datetime = None, end: datetime = None) -> Dict:

@@ -2,27 +2,27 @@ import logging
 from rest_adapter import RestAdapter
 from exceptions import OceanSDKException
 from models import Result
-from datetime import datetime
+from datetime import datetime, timedelta
 
-class TideApi:
+class NdbcApi:
     def __init__(self, api_key: str = '', ver: str = 'v1', ssl_verify: bool = True, logger: logging.Logger = None):
-        """Constructor for TideApi, composed with RestAdapter 
+        """Constructor for NdbcApi, composed with RestAdapter 
 
         Args:
-            hostname (str, optional): Set to api.tidesandcurrents.noaa.gov.
+            hostname (str, optional): Set to https://www.ndbc.noaa.gov/.
             api_key (str, optional): Not used. Defaults to ''.
             ver (str, optional): Defaults to 'v1'.
             ssl_verify (bool, optional): Defaults to True.
             logger (logging.Logger, optional): Pass explictly else will be created with __name__.
         """
         self._logger = logger or logging.getLogger(__name__)
-        self._rest_adapter = RestAdapter('api.tidesandcurrents.noaa.gov/', api_key, ver, ssl_verify, logger)
+        self._rest_adapter = RestAdapter('https://www.ndbc.noaa.gov/', api_key, ver, ssl_verify, logger)
         
-    def tides_hourly(self, station:str, start:datetime, end: datetime) -> Result:
-        """Returns Result for stationID and datetime start and end
+    def measurements_hourly(self, buoy:str, start:datetime, end: datetime) -> Result:
+        """Returns Result for buoyID and datetime start and end
 
         Args:
-            station (str): Station ID.
+            buoy (str): buoy ID.
             start (datetime): start datetime.
             end (datetime): end datetime.
 
@@ -33,6 +33,15 @@ class TideApi:
             Result: _description_
         """
         
+        # Call endpoint
+        if start|end < (datetime.today() - timedelta(days=45)):
+            # "realtime" endpoint covers prev 45 days
+            endpoint = f"/data/realtime2/{buoy}.txt"
+            result = self._rest_adapter.get(endpoint=endpoint,ep_params=ep_params)
+        else:
+            # todo: handle endpoint for archival data
+            raise OceanSDKException("ndbc time range exceeded")
+            
         # endpoint param formatting
         begin_date = f"{start.year}{start.month:02}{start.day:02}"
         end_date = f"{end.year}{end.month:02}{end.day:02}"
@@ -51,22 +60,22 @@ class TideApi:
         }
         
         # Call endpoint
-        result = self._rest_adapter.get(endpoint='api/prod/datagetter?',ep_params=ep_params)
+        
         
         # unpack
         try:
             data = result.data['predictions']   # key for tide predictions
         except (KeyError) as e:
             self._logger.error(result.data)
-            raise OceanSDKException("TideApi unpacking error") from e
+            raise OceanSDKException("NdbcApi unpacking error") from e
         
         result = Result(status_code=result.status_code, message = result.message, data=data)
         return result
 
         
 if __name__ == '__main__':
-    tideapi = TideApi()
-    result = tideapi.tides_hourly(9410230, datetime.today(),datetime.today())
+    api = NdbcApi()
+    result = api.get_hourly(46224,datetime.today(),datetime.today())
     print(result)
     # import pdb
     # pdb.set_trace()
