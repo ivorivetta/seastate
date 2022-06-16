@@ -4,9 +4,11 @@
 Facade of weather APIs for collecting ocean state by location and timeframe
 
 **Notable features**
-- Tides, weather, swell harmonics.. see all
-- Local timezone as default, time offset feature allows building of time coherent datasets
+- Time offset feature allows building of time coherent datasets, defaut is local timezone of measurement
+- Closest active measurement station is selected by default, filters can be used to select certain agencies
 - request-cache implemented with appropriate timeouts for each datasource
+- Forecasting available for Tide
+- Available datasources: Tide, wind, water temp ...
 
 **Requested Features**
 - Automatically reach into historical archives for older datasets

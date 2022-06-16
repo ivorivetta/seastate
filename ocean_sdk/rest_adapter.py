@@ -7,18 +7,17 @@ from exceptions import OceanSDKException
 from models import Result
         
 class RestAdapter:
-    def __init__(self, hostname: str, api_key: str = '', ver: str = 'v1', ssl_verify: bool = True, logger: logging.Logger = None):
+    def __init__(self, hostname: str, api_key: str = '', ssl_verify: bool = True, logger: logging.Logger = None):
         """Constructor for RestAdapter, supports GET
 
         Args:
             hostname (str): hostname for http request
             api_key (str, optional): Defaults to ''.
-            ver (str, optional): Defaults to 'v1'.
             ssl_verify (bool, optional): Defaults to True.
             logger (logging.Logger, optional): Pass explictly else will be created with __name__.
         """
         self._logger = logger or logging.getLogger(__name__)
-        self.url = "https://{}/{}/".format(hostname, ver)
+        self.url = f"https://{hostname}"
         self._api_key = api_key
         self._ssl_verify = ssl_verify
         if not ssl_verify:
