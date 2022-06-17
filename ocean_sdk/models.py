@@ -9,7 +9,7 @@ class Result:
     Args:
         status_code (int): HTTP Status
         message (str, optional): Human readable result. Defaults to ''.
-        data (List[Dict], optional): Pyrhon list of Dicts. Defaults to None.
+        data (List[Dict], optional): Python list of Dicts. Defaults to None.
     """
     status_code: int
     message: str = ''
@@ -17,3 +17,17 @@ class Result:
     
     def __post__init__(self, data):
         self.data = data if data else [] #init data if dne
+
+@dataclass
+class Station:
+    id: str
+    lat: float
+    lon: float
+    tide: bool
+    wind: bool
+    water_temp: bool
+    air_temp: bool
+    name: str = ''
+    
+
+    
