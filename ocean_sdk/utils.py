@@ -29,7 +29,7 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     km = 6367 * c
     return km
 
-def nearest_station(category: str, lat: float, lon: float) -> str:
+def nearest_station(category: str, lat: float, lon: float, include: list=[], exclude: list=[]) -> str:
     """Returns nearest station from list
 
     Args:

@@ -14,7 +14,7 @@ def TestOceanState(TestCase):
     def test_la_jolla_nearest_tide_station(self):
         assert False
         
-    # get_hourly tests
+    # hourly tests
     def test_good_call_returns_result(self):
         assert False
         

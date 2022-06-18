@@ -19,7 +19,7 @@ class TidesAndCurrentsApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter('api.tidesandcurrents.noaa.gov/', api_key, ssl_verify, logger)
         
-    def get_hourly(self, station:str, start:datetime, end: datetime, category:str) -> Result:
+    def hourly(self, station:str, start:datetime, end: datetime, category:str) -> Result:
         """Returns Result for stationID and datetime start and end. Args should be validated externally
 
         Args:
@@ -38,7 +38,7 @@ class TidesAndCurrentsApi:
         begin_date = f"{start.year}{start.month:02}{start.day:02}"
         end_date = f"{end.year}{end.month:02}{end.day:02}"
         
-        # category string handling for enpoint and result unpacking
+        # category string handling for endpoint and result unpacking
         if 'tide' in category:
             product = key = 'predictions'
         elif 'wind' in category:
@@ -83,11 +83,11 @@ class TidesAndCurrentsApi:
         
 if __name__ == '__main__':
     api = TidesAndCurrentsApi()
-    result = api.get_hourly(9410230, datetime.today(),datetime.today(),'wind')
+    result = api.hourly(9410230, datetime.today(),datetime.today(),'wind')
     print(result)
-    # result = api.get_hourly(9410230, datetime.today(),datetime.today(),'air_temp')
+    # result = api.hourly(9410230, datetime.today(),datetime.today(),'air_temp')
     # print(result)
-    # result = api.get_hourly(9410230, datetime.today(),datetime.today(),'water_temp')
+    # result = api.hourly(9410230, datetime.today(),datetime.today(),'water_temp')
     # print(result)
     # import pdb
     # pdb.set_trace()

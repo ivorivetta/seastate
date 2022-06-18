@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Union
 from exceptions import OceanSDKException
-from noaa_tides import TideApi
+from tides import TideApi
 from datetime import datetime, timedelta
 from utils import nearest_station
 from pandas import DataFrame
@@ -9,14 +9,13 @@ from pandas import DataFrame
 logging.basicConfig(level=logging.DEBUG)
 
 class OceanState:
-    def __init__(self, lat: float, lon: float, logger: logging.Logger = None):
+    def __init__(self, lat: float, lon: float, include: list=[], exclude: list=[], logger: logging.Logger = None):
         self._logger = logger or logging.getLogger(__name__)
         self.lat = float(lat)
         self.lon = float(lon)
-        self._tide_api = TideApi()
-        self.tide_station_nearest = nearest_station('tide', self.lat, self.lon)
+        self.tide = TideApi(self.lat, self.lon, include, exclude)
         
-    def get_hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
+    def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
         # Process timeframe
         # todo: handle iso date strings
         # todo: handle bad date strings
@@ -33,21 +32,31 @@ class OceanState:
         
         # Get data
         # todo: if status_code is good, return
-        tide = self._tide_api.tides_hourly(self.tide_station_nearest, start, end)
+        tide = self.tide.hourly(start, end)
         return tide
     
-    def get_hourly_df(self, start: datetime = None, end: datetime = None) -> Dict:
-        data = self.get_hourly(start,end)
+    # def hourly_df(self, start: datetime = None, end: datetime = None) -> Dict:
+    #     data = self.hourly(start,end)
         
-        # todo: unpack into dataframe
-        df = DataFrame()
+    #     # todo: unpack into dataframe
+    #     df = DataFrame()
         
         return data
 
 if __name__ == '__main__':
     test = OceanState(32,-117)
-    result = test.get_hourly()
+    result = test.hourly()
     print(result)
     import pdb
     pdb.set_trace()
-        
+
+        # todo: move this to a mediator class and inherit?
+        # todo: does util cover it?
+        # mediator behavior
+            ## filters
+            # if include and exclude is blank, default is closest and active for __name__
+            # if 'inactive' in include, poll inactive stations as well?
+            # if include is not empty, only include modules specified
+            # if include is not empty, only include data sources specified
+            # if exclude is not empty, exclude data sources and modules specified
+            # if a specific stationID is specified, exclude that

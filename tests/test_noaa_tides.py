@@ -9,7 +9,7 @@ def TestTideApi(TestCase):
         self._tide_api = TideApi()
         self.response = requests.Response()
         
-    # get_hourly tests
+    # hourly tests
     def test_good_call_returns_result(self):
         assert False
         

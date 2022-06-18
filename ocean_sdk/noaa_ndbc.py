@@ -5,18 +5,17 @@ from models import Result
 from datetime import datetime, timedelta
 
 class NdbcApi:
-    def __init__(self, api_key: str = '', ver: str = 'v1', ssl_verify: bool = True, logger: logging.Logger = None):
+    def __init__(self, api_key: str = '', ssl_verify: bool = True, logger: logging.Logger = None):
         """Constructor for NdbcApi, composed with RestAdapter 
 
         Args:
             hostname (str, optional): Set to https://www.ndbc.noaa.gov/.
             api_key (str, optional): Not used. Defaults to ''.
-            ver (str, optional): Defaults to 'v1'.
             ssl_verify (bool, optional): Defaults to True.
             logger (logging.Logger, optional): Pass explictly else will be created with __name__.
         """
         self._logger = logger or logging.getLogger(__name__)
-        self._rest_adapter = RestAdapter('https://www.ndbc.noaa.gov/', api_key, ver, ssl_verify, logger)
+        self._rest_adapter = RestAdapter('https://www.ndbc.noaa.gov/', api_key, ssl_verify, logger)
         
     def measurements_hourly(self, buoy:str, start:datetime, end: datetime) -> Result:
         """Returns Result for buoyID and datetime start and end
@@ -75,7 +74,7 @@ class NdbcApi:
         
 if __name__ == '__main__':
     api = NdbcApi()
-    result = api.get_hourly(46224,datetime.today(),datetime.today())
+    result = api.hourly(46224,datetime.today(),datetime.today())
     print(result)
     # import pdb
     # pdb.set_trace()
