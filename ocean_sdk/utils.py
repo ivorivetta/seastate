@@ -48,6 +48,8 @@ def nearest_station(category: str, lat: float, lon: float, include: list=[], exc
     try:
         if 'tide' in category.lower():
             stations = noaa_tide_stations
+        elif 'wind' in category.lower():
+            stations = noaa_tide_stations
         else:
             pass
     except (KeyError) as e:

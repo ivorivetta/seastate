@@ -2,6 +2,7 @@ import logging
 from typing import Dict, Union
 from exceptions import OceanSDKException
 from tides import TideApi
+from winds import WindApi
 from datetime import datetime, timedelta
 from utils import nearest_station
 from pandas import DataFrame
@@ -13,7 +14,10 @@ class OceanState:
         self._logger = logger or logging.getLogger(__name__)
         self.lat = float(lat)
         self.lon = float(lon)
+        self.include = include
+        self.exclude = exclude
         self.tide = TideApi(self.lat, self.lon, include, exclude)
+        self.wind = WindApi(self.lat, self.lon, include, exclude)
         
     def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
         # Process timeframe
