@@ -29,11 +29,11 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     km = 6367 * c
     return km
 
-def nearest_station(category: str, lat: float, lon: float, include: list=[], exclude: list=[]) -> str:
+def nearest_station(measure: str, lat: float, lon: float, include: list=[], exclude: list=[]) -> str:
     """Returns nearest station from list
 
     Args:
-        category (str): Measurement category for switching data source
+        measure (str): Measurement type for switching data source
             [tide]
         lat (float): Coordinate in decimal degrees
         lon (float): Coordinate in decimal degrees
@@ -44,11 +44,11 @@ def nearest_station(category: str, lat: float, lon: float, include: list=[], exc
     Returns:
         str: Unique station ID
     """
-    # Select measurement category and return dict of stations
+    # Select measurement measure and return dict of stations
     try:
-        if 'tide' in category.lower():
+        if 'tide' in measure.lower():
             stations = noaa_tide_stations
-        elif 'wind' in category.lower():
+        elif 'wind' in measure.lower():
             stations = noaa_tide_stations
         else:
             pass

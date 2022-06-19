@@ -4,7 +4,7 @@ from exceptions import OceanSDKException
 from tides import TideApi
 from winds import WindApi
 from datetime import datetime, timedelta
-from utils import nearest_station
+# from utils import nearest_station
 from pandas import DataFrame
 
 logging.basicConfig(level=logging.DEBUG)
