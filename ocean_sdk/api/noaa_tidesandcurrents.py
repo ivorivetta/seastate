@@ -1,5 +1,5 @@
 import logging
-from rest_adapter import RestAdapter
+from api.rest_adapter import RestAdapter
 from exceptions import OceanSDKException
 from models import Result
 from datetime import datetime
@@ -50,6 +50,9 @@ class TidesAndCurrentsApi:
             key = 'data'
         elif 'water_temp' in measure:
             product = 'water_temperature'
+            key = 'data'
+        elif 'air_press' in measure:
+            product = 'air_pressure'
             key = 'data'
         else:
             raise OceanSDKException("Unsupported measurement requested")

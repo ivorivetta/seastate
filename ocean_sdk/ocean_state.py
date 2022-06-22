@@ -1,11 +1,12 @@
 import logging
-from typing import Dict, Union
-from exceptions import OceanSDKException
-from tides import TideApi
-from winds import WindApi
 from datetime import datetime, timedelta
-# from utils import nearest_station
+from typing import Dict, Union
+
 from pandas import DataFrame
+
+from exceptions import OceanSDKException
+from tide import TideApi
+from wind import WindApi
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -16,8 +17,8 @@ class OceanState:
         self.lon = float(lon)
         self.include = include
         self.exclude = exclude
-        self.tide = TideApi(self.lat, self.lon, include, exclude)
-        self.wind = WindApi(self.lat, self.lon, include, exclude)
+        self.tide = TideApi(self.lat, self.lon, self.include, self.exclude)
+        self.wind = WindApi(self.lat, self.lon, self.include, self.exclude)
         
     def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
         # Process timeframe
@@ -53,14 +54,3 @@ if __name__ == '__main__':
     print(result)
     import pdb
     pdb.set_trace()
-
-        # todo: move this to a mediator class and inherit?
-        # todo: does util cover it?
-        # mediator behavior
-            ## filters
-            # if include and exclude is blank, default is closest and active for __name__
-            # if 'inactive' in include, poll inactive stations as well?
-            # if include is not empty, only include modules specified
-            # if include is not empty, only include data sources specified
-            # if exclude is not empty, exclude data sources and modules specified
-            # if a specific stationID is specified, exclude that

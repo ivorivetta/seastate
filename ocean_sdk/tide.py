@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from api_mediator import ApiMediator
+from api.api_mediator import ApiMediator
 
 from exceptions import OceanSDKException
 from models import Result

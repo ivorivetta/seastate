@@ -1,11 +1,13 @@
 import logging
+from json import JSONDecodeError
+from typing import Dict, List
+
 import requests
 import requests.packages
-from typing import List, Dict
-from json import JSONDecodeError
-from exceptions import OceanSDKException
-from models import Result
-        
+from ocean_sdk.exceptions import OceanSDKException
+from ocean_sdk.models import Result
+
+
 class RestAdapter:
     def __init__(self, hostname: str, api_key: str = '', ssl_verify: bool = True, logger: logging.Logger = None):
         """Constructor for RestAdapter, supports GET

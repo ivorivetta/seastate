@@ -1,5 +1,5 @@
 import logging
-from rest_adapter import RestAdapter
+from api.rest_adapter import RestAdapter
 from exceptions import OceanSDKException
 from models import Result
 from datetime import datetime, timedelta
@@ -17,11 +17,11 @@ class NdbcApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter('https://www.ndbc.noaa.gov/', api_key, ssl_verify, logger)
         
-    def measurements_hourly(self, buoy:str, start:datetime, end: datetime) -> Result:
-        """Returns Result for buoyID and datetime start and end
+    def measurements_hourly(self, station:str, start:datetime, end: datetime) -> Result:
+        """Returns Result for stationID and datetime start and end
 
         Args:
-            buoy (str): buoy ID.
+            station (str): station ID.
             start (datetime): start datetime.
             end (datetime): end datetime.
 
@@ -35,7 +35,7 @@ class NdbcApi:
         # Call endpoint
         if start|end < (datetime.today() - timedelta(days=45)):
             # "realtime" endpoint covers prev 45 days
-            endpoint = f"/data/realtime2/{buoy}.txt"
+            endpoint = f"/data/realtime2/{station}.txt"
             result = self._rest_adapter.get(endpoint=endpoint,ep_params=ep_params)
         else:
             # todo: handle endpoint for archival data
