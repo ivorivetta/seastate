@@ -5,10 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
+            "name": "Python: api submodule",
             "type": "python",
             "request": "launch",
-            "module": "ocean_sdk.api.datasources",
+            "module": "ocean_sdk.api.${fileBasenameNoExtension}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: module debug",
+            "type": "python",
+            "request": "launch",
+            "module": "ocean_sdk.${fileBasenameNoExtension}",
             "console": "integratedTerminal",
             "justMyCode": true
         },

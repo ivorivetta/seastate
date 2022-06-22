@@ -22,14 +22,14 @@ class Station:
     id: str
     lat: float
     lon: float
-    tide: bool
-    wind_spd: bool
-    wind_dir: bool
-    wind_gust: bool
-    water_temp: bool
-    air_temp: bool
-    air_press: bool
-    wave: bool
+    tide: bool = False
+    wind_spd: bool = False
+    wind_dir: bool = False
+    wind_gust: bool = False
+    water_temp: bool = False
+    air_temp: bool = False
+    air_press: bool = False
+    wave: bool = False
     isActive: bool = False
     name: str = ''
     
