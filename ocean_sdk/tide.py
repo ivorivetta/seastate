@@ -12,7 +12,7 @@ class TideApi(ApiMediator):
     def __init__(self, lat: float, lon: float, include: list=[], exclude: list=[], ssl_verify: bool = True, logger: logging.Logger = None):
         """Constructor for TideApi, inherits the following from ApiMediator:
             .api - configured rest adapter
-            .measure - measurement type
+            .measurement - measurement type
             .station - measurement station ID
 
         Args:
@@ -26,7 +26,7 @@ class TideApi(ApiMediator):
         super().__init__('tide', lat, lon, include, exclude, ssl_verify, logger)
         
     def hourly(self, start:datetime, end: datetime) -> Result:
-        result = self.api.hourly(self.measure, self.station, start, end)
+        result = self.api.hourly(self.measurement, self.station, start, end)
         return result
 
         

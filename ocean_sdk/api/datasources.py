@@ -5,11 +5,23 @@ import defusedxml.minidom
 from ocean_sdk.models import Station
 from ocean_sdk.exceptions import OceanSDKException
 import requests
+from ocean_sdk.api.noaa_ndbc import NdbcApi
+from ocean_sdk.api.noaa_tidesandcurrents import TidesAndCurrentsApi
 
 class DataSources:
     def __init__(self, logger: logging.Logger = None):
         self._logger = logger or logging.getLogger(__name__)
         
+    def all(self) -> List[Station]:
+        """Convenience function for all stations
+
+        Returns:
+            List[Station]: _description_
+        """
+        stations = self.ndbc_stations()
+        stations += self.tides_and_currents_stations()
+        return stations
+    
     def ndbc_stations(self) -> List[Station]:
         """Parse a text table
 
@@ -47,6 +59,7 @@ class DataSources:
                 id= line[0],
                 lat= float(line[1]),
                 lon= float(line[2]),
+                api= NdbcApi
                 tide= True if line[21] != 'MM' else False,
                 wind_spd= True if line[8] != 'MM' else False,
                 wind_dir= True if line[9] != 'MM' else False,
@@ -85,6 +98,7 @@ class DataSources:
                 temp['id'] = line.getAttribute('ID')
                 temp['lat'] = float(line.getElementsByTagName('lat')[0].firstChild.nodeValue)
                 temp['lon'] = float(line.getElementsByTagName('long')[0].firstChild.nodeValue)
+                temp['api'] = TidesAndCurrentsApi
             except (IndexError) as e:
                 # Faulty station, skip station node
                 # todo: refactor into object to properly log parsing errors
@@ -105,6 +119,8 @@ class DataSources:
                     temp['water_temp'] = True
                 elif 'Air Pressure' in name and status:
                     temp['air_press'] = True
+                elif 'Conductivity' in name and status:
+                    temp['conductivity'] = True
                 else:
                     pass          
 

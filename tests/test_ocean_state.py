@@ -24,7 +24,7 @@ def TestOceanState(TestCase):
     def test_good_df_call_returns_df(self):
         assert False
         
-    def test_bad_measure_raises_keyerror(self):
+    def test_bad_measurement_raises_keyerror(self):
         assert False
         
     def test_bad_timestring_raises_typeerror(self):

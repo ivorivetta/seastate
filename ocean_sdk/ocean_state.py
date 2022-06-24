@@ -15,8 +15,8 @@ class OceanState:
         self._logger = logger or logging.getLogger(__name__)
         self.lat = float(lat)
         self.lon = float(lon)
-        self.include = include
-        self.exclude = exclude
+        self.include = list(include)
+        self.exclude = list(exclude)
         self.tide = TideApi(self.lat, self.lon, self.include, self.exclude)
         self.wind = WindApi(self.lat, self.lon, self.include, self.exclude)
         

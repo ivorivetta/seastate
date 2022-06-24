@@ -19,11 +19,11 @@ class TidesAndCurrentsApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter('api.tidesandcurrents.noaa.gov/', api_key, ssl_verify, logger)
         
-    def hourly(self, measure:str, station:str, start:datetime, end: datetime) -> Result:
+    def hourly(self, measurement:str, station:str, start:datetime, end: datetime) -> Result:
         """Returns Result for stationID and datetime start and end. Args should be validated externally
 
         Args:
-            measure (str): measurement type can be tide|wind|water_temp|air_temp.
+            measurement (str): measurement type can be tide|wind|water_temp|air_temp.
             station (str): Station ID.
             start (datetime): start datetime.
             end (datetime): end datetime.
@@ -39,19 +39,19 @@ class TidesAndCurrentsApi:
         begin_date = f"{start.year}{start.month:02}{start.day:02}"
         end_date = f"{end.year}{end.month:02}{end.day:02}"
         
-        # measure type string handling for endpoint and result unpacking
-        if 'tide' in measure:
+        # measurement type string handling for endpoint and result unpacking
+        if 'tide' in measurement:
             product = key = 'predictions'
-        elif 'wind' in measure:
+        elif 'wind' in measurement:
             product = 'wind'
             key = 'data'
-        elif 'air_temp' in measure:
+        elif 'air_temp' in measurement:
             product = 'air_temperature'
             key = 'data'
-        elif 'water_temp' in measure:
+        elif 'water_temp' in measurement:
             product = 'water_temperature'
             key = 'data'
-        elif 'air_press' in measure:
+        elif 'air_press' in measurement:
             product = 'air_pressure'
             key = 'data'
         else:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List, Dict, Any
 
 @dataclass
 class Result:
@@ -22,6 +22,7 @@ class Station:
     id: str
     lat: float
     lon: float
+    api: Any
     tide: bool = False
     wind_spd: bool = False
     wind_dir: bool = False
@@ -30,12 +31,35 @@ class Station:
     air_temp: bool = False
     air_press: bool = False
     wave: bool = False
+    conductivity: bool = False
     isActive: bool = False
     name: str = ''
     
     def __post__init__(self, tide, wind_spd, water_temp, air_temp, air_press, wave):
+        # toggle if self.isActive
         if tide or wind_spd or water_temp or air_temp or air_press or wave:
             self.isActive = True # Mark active if any viable measurement sources exist
+            
+    def supported_measurements(self) -> List[str]:
+        """Return list of supported measurements for station
+
+        Returns:
+            List[str]: _description_
+        """
+        # hash of key:measurement mapping
+        hash_map = {
+            'tide': 'Tide'
+        }
+        # return list of measurements where True
+        supported = []
+        for key in hash_map:
+            if self.__getattribute__(key):
+                supported.append(hash_map[key])
+        return supported
+        
+        
+        
+        
     
 # @dataclass
 # class Wave:

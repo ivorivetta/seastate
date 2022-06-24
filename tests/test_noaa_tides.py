@@ -19,8 +19,8 @@ def TestTideApi(TestCase):
     def test_empty_call_raises_error(self):
         assert False
     
-    # measure switch
-    def test_bad_measure_raises_keyerror(self):
+    # measurement switch
+    def test_bad_measurement_raises_keyerror(self):
         assert False
     
     # time window feature

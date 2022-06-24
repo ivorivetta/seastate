@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime
+from typing import Any
 
 from exceptions import OceanSDKException
 from models import Result
-from api.noaa_tidesandcurrents import TidesAndCurrentsApi
+from ocean_sdk.api.noaa_tidesandcurrents import TidesAndCurrentsApi
 from utils import haversine
-from api.datasources import noaa_tide_stations
+from ocean_sdk.api.datasources import DataSources
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -21,12 +22,12 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class ApiMediator:
-    def __init__(self, measure: str, lat: float, lon: float, include: list=[], exclude: list=[], ssl_verify: bool = True, logger: logging.Logger = None):
+    def __init__(self, measurement: str, lat: float, lon: float, include: list=[], exclude: list=[], ssl_verify: bool = True, logger: logging.Logger = None):
         """Constructor for configured api endpoint based on measurement type, gps coordinates and include/exclude filters 
         """
         self._ssl_verify = ssl_verify
         self._logger = logger or logging.getLogger(__name__)
-        self.measure = measure
+        self.measurement = measurement
         self.station = '' # overridden by api setter, can be set manually
         self.api = (lat, lon, include, exclude) # pass to property setter
         
@@ -48,11 +49,11 @@ class ApiMediator:
         # self._api = TidesAndCurrentsApi()
 
 
-    def nearest_station(measure: str, lat: float, lon: float, include: list=[], exclude: list=[]) -> str:
+    def nearest_station(measurement: str, lat: float, lon: float, include: list=[], exclude: list=[]) -> str:
         """Returns nearest station from list
 
         Args:
-            measure (str): Measurement type for switching data source
+            measurement (str): Measurement type for switching data source
                 [tide]
             lat (float): Coordinate in decimal degrees
             lon (float): Coordinate in decimal degrees
@@ -63,27 +64,31 @@ class ApiMediator:
         Returns:
             str: Unique station ID
         """
-        # Select measurement measure and return dict of stations
+        # Select measurement and return dict of stations
         try:
-            if 'tide' in measure.lower():
-                stations = noaa_tide_stations
-            elif 'wind' in measure.lower():
-                stations = noaa_tide_stations
-            else:
-                pass
+            # Return all stations
+            stations = DataSources.all()
         except (KeyError) as e:
             raise OceanSDKException("No Category found") from e
 
         # Find station closest to input coordinates using haversine
-        # and is also active for specified measure
+        # and is also active for specified measurement
         min = float('inf') # Initialize minimum pointer
-        for k,v in stations.items():
-            new_val = haversine(lat, lon, v['lat'], v['lon'])
-            # todo: AND is active
+        for station in stations:
+            # skip if station is inactive
+            if not station.isActive:
+                continue
+            # skip if station does not support measurement
+            if measurement not in station.supported_measurements():
+                continue
+            # compute distance between OceanState coords and current station
+            new_val = haversine(lat, lon, station.lat, station.lon)
+            # if closer, update new minimum
             if new_val < min:
                 min = new_val
-                min_key = k
-        return min_key, TidesAndCurrentsApi
+                id = station.id
+                api = station.api
+        return id, api
 
 
 
