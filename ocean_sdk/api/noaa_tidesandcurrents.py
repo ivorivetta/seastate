@@ -41,7 +41,8 @@ class TidesAndCurrentsApi:
         
         # measurement type string handling for endpoint and result unpacking
         if 'tide' in measurement:
-            product = key = 'predictions'
+            product = 'water_level'
+            key = 'data'
         elif 'wind' in measurement:
             product = 'wind'
             key = 'data'
@@ -54,6 +55,11 @@ class TidesAndCurrentsApi:
         elif 'air_press' in measurement:
             product = 'air_pressure'
             key = 'data'
+        elif 'conductivity' in measurement:
+            product = 'conductivity'
+            key = 'data'
+        elif 'tide_prediction' in measurement:
+            product = key = 'predictions'
         else:
             raise OceanSDKException("Unsupported measurement requested")
 
