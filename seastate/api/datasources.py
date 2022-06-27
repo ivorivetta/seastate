@@ -1,12 +1,15 @@
-from html.parser import HTMLParser
 import logging
+from html.parser import HTMLParser
 from typing import List
+
 import defusedxml.minidom
-from ocean_sdk.models import Station
-from ocean_sdk.exceptions import OceanSDKException
 import requests
-from ocean_sdk.api.noaa_ndbc import NdbcApi
-from ocean_sdk.api.noaa_tidesandcurrents import TidesAndCurrentsApi
+from seastate.api.rest_adapter import RestAdapter
+from seastate.api.noaa_ndbc import NdbcApi
+from seastate.api.noaa_tidesandcurrents import TidesAndCurrentsApi
+from seastate.exceptions import OceanSDKException
+from seastate.models import Station
+
 
 class DataSources:
     def __init__(self, logger: logging.Logger = None):
@@ -29,7 +32,8 @@ class DataSources:
             List[Station]: _description_
         """
         # request from realtimeOBS endpoint
-        result = requests.get('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt')
+        # result = requests.get('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt')
+        result = RestAdapter.get('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt')
         
         # main loop
         stations = []
@@ -83,9 +87,11 @@ class DataSources:
             List[Station]: _description_
         """
         # request data from realtimeOBS endpoint
-        result = requests.get('https://opendap.co-ops.nos.noaa.gov/stations/stationsXML.jsp')
+        # result = requests.get('https://opendap.co-ops.nos.noaa.gov/stations/stationsXML.jsp')
+        result = RestAdapter.get('https://opendap.co-ops.nos.noaa.gov/stations/stationsXML.jsp')
         # parse safely with defusedxml
-        dom = defusedxml.minidom.parseString(result.content.decode())
+        # dom = defusedxml.minidom.parseString(result.content.decode())
+        dom = defusedxml.minidom.parseString(result.data)
         station_elements = dom.getElementsByTagName('station')
         
         # traverse station elements

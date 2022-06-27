@@ -4,15 +4,15 @@ from typing import Any
 
 from exceptions import OceanSDKException
 from models import Result
-from ocean_sdk.api.noaa_tidesandcurrents import TidesAndCurrentsApi
+from seastate.api.noaa_tidesandcurrents import TidesAndCurrentsApi
 from utils import haversine
-from ocean_sdk.api.datasources import DataSources
+from seastate.api.datasources import DataSources
 
 logging.basicConfig(level=logging.DEBUG)
 
 
     # mediator behavior
-        ## filters
+        ## todo filters
         # if include and exclude is blank, default is closest and active for __name__
         # if 'inactive' in include, poll inactive stations as well?
         # if include is not empty, only include modules specified
@@ -81,7 +81,7 @@ class ApiMediator:
             # skip if station does not support measurement
             if measurement not in station.supported_measurements():
                 continue
-            # compute distance between OceanState coords and current station
+            # compute distance between SeaState coords and current station
             new_val = haversine(lat, lon, station.lat, station.lon)
             # if closer, update new minimum
             if new_val < min:

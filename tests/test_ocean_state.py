@@ -1,13 +1,13 @@
 from unittest import TestCase, mock
-from ocean_sdk.ocean_state import OceanState
-from ocean_sdk.models import Result
-from ocean_sdk.exceptions import OceanSDKException
+from seastate.seastate import SeaState
+from seastate.models import Result
+from seastate.exceptions import OceanSDKException
 import requests
 
-def TestOceanState(TestCase):
+def TestSeaState(TestCase):
     def setUp(self):
         # La Jolla test case
-        self._ocean_state = OceanState(32,-117)
+        self._ocean_state = SeaState(32,-117)
         self.response = requests.Response()
         
     # Tide Station Nearest

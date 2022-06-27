@@ -1,7 +1,7 @@
 from unittest import TestCase, mock
-from ocean_sdk.rest_adapter import RestAdapter
-from ocean_sdk.models import Result
-from ocean_sdk.exceptions import OceanSDKException
+from seastate.rest_adapter import RestAdapter
+from seastate.models import Result
+from seastate.exceptions import OceanSDKException
 import requests
 
 class TestRestAdapter(TestCase):

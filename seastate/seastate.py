@@ -10,7 +10,7 @@ from wind import WindApi
 
 logging.basicConfig(level=logging.DEBUG)
 
-class OceanState:
+class SeaState:
     def __init__(self, lat: float, lon: float, include: list=[], exclude: list=[], logger: logging.Logger = None):
         self._logger = logger or logging.getLogger(__name__)
         self.lat = float(lat)
@@ -49,7 +49,7 @@ class OceanState:
         return data
 
 if __name__ == '__main__':
-    test = OceanState(32,-117)
+    test = SeaState(32,-117)
     result = test.hourly()
     print(result)
     import pdb

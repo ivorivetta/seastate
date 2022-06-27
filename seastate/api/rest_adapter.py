@@ -1,11 +1,12 @@
 import logging
 from json import JSONDecodeError
 from typing import Dict, List
+from numpy import full
 
 import requests
 import requests.packages
-from ocean_sdk.exceptions import OceanSDKException
-from ocean_sdk.models import Result
+from seastate.exceptions import OceanSDKException
+from seastate.models import Result
 
 
 class RestAdapter:
@@ -65,7 +66,18 @@ class RestAdapter:
             raise OceanSDKException("Request Failed") from e
         # Parse JSON ouput to Python object or return failed Result on exception
         try:
-            data_out = response.json()
+            if '.txt' in full_url:
+                # handle txt based files from nonRest endpoints
+                data_out = response.text()
+            elif '.xml' in full_url:
+                # handle xml files from nonRest endpoints
+                data_out = response.text()
+            elif any(x in full_url for x in ['spec','.sw']):
+                # handle the 7 different spectral file extensions
+                data_out = response.text()
+            else:
+                # handle a restful endpoint
+                data_out = response.json()
         except (ValueError, JSONDecodeError) as e:
             self._logger.error(msg=log_line_post.format(False, None, e))
             raise OceanSDKException("Bad JSON in Response") from e

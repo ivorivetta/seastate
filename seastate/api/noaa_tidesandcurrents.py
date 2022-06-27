@@ -73,7 +73,7 @@ class TidesAndCurrentsApi:
             'datum': 'MTL',
             'units': 'metric',
             'time_zone': 'lst_ldt',
-            'application': 'ocean_sdk',
+            'application': 'seastate',
             'format': 'json',
         }
         
