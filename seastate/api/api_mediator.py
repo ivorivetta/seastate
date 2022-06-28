@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, Tuple
 
 from exceptions import OceanSDKException
 from models import Result
@@ -49,7 +49,7 @@ class ApiMediator:
         # self._api = TidesAndCurrentsApi()
 
 
-    def nearest_station(measurement: str, lat: float, lon: float, include: list=[], exclude: list=[]) -> str:
+    def nearest_station(measurement: str, lat: float, lon: float, include: list=[], exclude: list=[]) -> Tuple[str, Any]:
         """Returns nearest station from list
 
         Args:

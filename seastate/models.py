@@ -37,7 +37,7 @@ class Station:
     
     def __post_init__(self):
         # toggle if self.isActive
-        if len(self.supported_measurements()) != 0:
+        if len(self.supported_measurements()) > 0:
             self.isActive = True
             
     def supported_measurements(self) -> List[str]:
@@ -47,7 +47,6 @@ class Station:
             List[str]: _description_
         """
         # hash of Result.key:formal measurement name mapping
-        #todo: wind gust is sloppy
         hash_map = {
             'tide': 'Tide',
             'wind_spd': 'Wind Speed',

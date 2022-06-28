@@ -31,22 +31,20 @@ class DataSources:
         Returns:
             List[Station]: _description_
         """
-        # request from realtimeOBS endpoint
-        # result = requests.get('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt')
+        # check station status by retrieving latest measurements from all stations
         result = RestAdapter('www.ndbc.noaa.gov/').get('data/latest_obs/latest_obs.txt')
         
-        # main loop
+        # loop through text lines and parse data
         stations = []
         for i, value in enumerate(result.data.split('\n')):
-            # parse data
+            # skipping 2 header lines
             if i == 0:
-                print(value)
                 continue #skip header
             elif i == 1:
                 continue #skip units
-            line = value.split(' ')
-                
-            # clean out empties
+            
+            # split current line by delimiter and clear empty values
+            line = value.split(' ')    
             while ' ' in line:
                 line.remove(' ')
             while '' in line:
@@ -87,25 +85,24 @@ class DataSources:
         Returns:
             List[Station]: _description_
         """
-        # request data from realtimeOBS endpoint
-        # result = requests.get('https://opendap.co-ops.nos.noaa.gov/stations/stationsXML.jsp')
+        # TidesAndCurrent station capabilities are kept here
         result = RestAdapter('opendap.co-ops.nos.noaa.gov/').get('stations/stationsXML.jsp')
-        # parse safely with defusedxml
-        # dom = defusedxml.minidom.parseString(result.content.decode())
+        
+        # parse xml elements safely with defusedxml -> []
         dom = defusedxml.minidom.parseString(result.data)
         station_elements = dom.getElementsByTagName('station')
         
-        # traverse station elements
+        # traverse station elements to build Station objects
         stations = []
         for line in station_elements:
-            temp = {}
+            foo = {}
             # parse station metadata into temporary dict
             try:
-                temp['name'] = line.getAttribute('name')
-                temp['id'] = line.getAttribute('ID')
-                temp['lat'] = float(line.getElementsByTagName('lat')[0].firstChild.nodeValue)
-                temp['lon'] = float(line.getElementsByTagName('long')[0].firstChild.nodeValue)
-                temp['api'] = TidesAndCurrentsApi()
+                foo['name'] = line.getAttribute('name')
+                foo['id'] = line.getAttribute('ID')
+                foo['lat'] = float(line.getElementsByTagName('lat')[0].firstChild.nodeValue)
+                foo['lon'] = float(line.getElementsByTagName('long')[0].firstChild.nodeValue)
+                foo['api'] = TidesAndCurrentsApi()
             except (IndexError) as e:
                 # Faulty station, skip station node
                 # todo: refactor into object to properly log parsing errors
@@ -116,26 +113,27 @@ class DataSources:
                 name = m.attributes['name'].value
                 status = True if m.attributes['status'].value == '1' else False
                 if 'Water Level' in name and status:
-                    temp['tide'] = True
+                    foo['tide'] = True
                 elif 'Winds' in name and status:
-                    temp['wind_spd'] = True
+                    foo['wind_spd'] = True
                     # todo: wind dir and gust may or may not be true
                 elif 'Air Temp' in name and status:
-                    temp['air_temp'] = True
+                    foo['air_temp'] = True
                 elif 'Water Temp' in name and status:
-                    temp['water_temp'] = True
+                    foo['water_temp'] = True
                 elif 'Air Pressure' in name and status:
-                    temp['air_press'] = True
+                    foo['air_press'] = True
                 elif 'Conductivity' in name and status:
-                    temp['conductivity'] = True
+                    foo['conductivity'] = True
                 else:
                     pass          
 
             # construct station with temp var
-            stations.append(Station(**temp))
+            stations.append(Station(**foo))
+            
         # Check parsing was succesful
         if len(stations) == 0:
-            raise OceanSDKException("No stations successfully parsed, plz submit issue")
+            raise OceanSDKException("No stations successfully parsed, please submit issue")
         return stations
     
 
