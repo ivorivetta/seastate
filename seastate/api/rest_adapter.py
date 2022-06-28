@@ -8,6 +8,7 @@ import requests.packages
 from seastate.exceptions import OceanSDKException
 from seastate.models import Result
 
+logging.basicConfig(level=logging.DEBUG)
 
 class RestAdapter:
     def __init__(self, hostname: str, api_key: str = '', ssl_verify: bool = True, logger: logging.Logger = None):
@@ -66,15 +67,15 @@ class RestAdapter:
             raise OceanSDKException("Request Failed") from e
         # Parse JSON ouput to Python object or return failed Result on exception
         try:
-            if '.txt' in full_url:
+            if '.txt' in full_url.lower():
                 # handle txt based files from nonRest endpoints
-                data_out = response.text()
-            elif '.xml' in full_url:
+                data_out = response.text
+            elif 'xml' in full_url.lower():
                 # handle xml files from nonRest endpoints
-                data_out = response.text()
-            elif any(x in full_url for x in ['spec','.sw']):
+                data_out = response.text
+            elif any(x in full_url.lower() for x in ['spec','.sw']):
                 # handle the 7 different spectral file extensions
-                data_out = response.text()
+                data_out = response.text
             else:
                 # handle a restful endpoint
                 data_out = response.json()

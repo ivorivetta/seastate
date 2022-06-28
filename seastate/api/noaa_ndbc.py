@@ -1,8 +1,10 @@
 import logging
-from api.rest_adapter import RestAdapter
-from exceptions import OceanSDKException
-from models import Result
 from datetime import datetime, timedelta
+
+from seastate.api.rest_adapter import RestAdapter
+from seastate.exceptions import OceanSDKException
+from seastate.models import Result
+
 
 class NdbcApi:
     def __init__(self, api_key: str = '', ssl_verify: bool = True, logger: logging.Logger = None):

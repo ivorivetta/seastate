@@ -33,18 +33,18 @@ class DataSources:
         """
         # request from realtimeOBS endpoint
         # result = requests.get('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt')
-        result = RestAdapter.get('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt')
+        result = RestAdapter('www.ndbc.noaa.gov/').get('data/latest_obs/latest_obs.txt')
         
         # main loop
         stations = []
-        for i, value in enumerate(result.iter_lines()):
+        for i, value in enumerate(result.data.split('\n')):
             # parse data
             if i == 0:
                 print(value)
                 continue #skip header
             elif i == 1:
                 continue #skip units
-            line = value.decode().split(' ')
+            line = value.split(' ')
                 
             # clean out empties
             while ' ' in line:
@@ -52,10 +52,11 @@ class DataSources:
             while '' in line:
                 line.remove('')
             
-            # todo: check length
+            # skip corrupted lines
             if len(line) != 22:
-                print('length off')
-                print(line)
+                self._logger.info("No station info in this line: " + str(line))
+                continue
+
             
             # parse stationID, gps, and confirm active measurement sources
             # 'MM' is NOAA's notation for missing measurement
@@ -63,7 +64,7 @@ class DataSources:
                 id= line[0],
                 lat= float(line[1]),
                 lon= float(line[2]),
-                api= NdbcApi
+                api= NdbcApi(),
                 tide= True if line[21] != 'MM' else False,
                 wind_spd= True if line[8] != 'MM' else False,
                 wind_dir= True if line[9] != 'MM' else False,
@@ -77,7 +78,7 @@ class DataSources:
         # return list of stations
         return stations
 
-    def tides_and_currents_stations() -> List[Station]:
+    def tides_and_currents_stations(self) -> List[Station]:
         """Parse xml doc
 
         Raises:
@@ -88,7 +89,7 @@ class DataSources:
         """
         # request data from realtimeOBS endpoint
         # result = requests.get('https://opendap.co-ops.nos.noaa.gov/stations/stationsXML.jsp')
-        result = RestAdapter.get('https://opendap.co-ops.nos.noaa.gov/stations/stationsXML.jsp')
+        result = RestAdapter('opendap.co-ops.nos.noaa.gov/').get('stations/stationsXML.jsp')
         # parse safely with defusedxml
         # dom = defusedxml.minidom.parseString(result.content.decode())
         dom = defusedxml.minidom.parseString(result.data)
@@ -104,7 +105,7 @@ class DataSources:
                 temp['id'] = line.getAttribute('ID')
                 temp['lat'] = float(line.getElementsByTagName('lat')[0].firstChild.nodeValue)
                 temp['lon'] = float(line.getElementsByTagName('long')[0].firstChild.nodeValue)
-                temp['api'] = TidesAndCurrentsApi
+                temp['api'] = TidesAndCurrentsApi()
             except (IndexError) as e:
                 # Faulty station, skip station node
                 # todo: refactor into object to properly log parsing errors
@@ -139,7 +140,8 @@ class DataSources:
     
 
 if __name__ == '__main__':
-    result = DataSources().tides_and_currents_stations()
+    tnc = DataSources().tides_and_currents_stations()
+    ndbc = DataSources().ndbc_stations()
     pass
     # import pdb
     # pdb.set_trace()

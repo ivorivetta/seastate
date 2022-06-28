@@ -35,10 +35,10 @@ class Station:
     isActive: bool = False
     name: str = ''
     
-    def __post__init__(self, tide, wind_spd, water_temp, air_temp, air_press, wave):
+    def __post_init__(self):
         # toggle if self.isActive
-        if tide or wind_spd or water_temp or air_temp or air_press or wave:
-            self.isActive = True # Mark active if any viable measurement sources exist
+        if len(self.supported_measurements()) != 0:
+            self.isActive = True
             
     def supported_measurements(self) -> List[str]:
         """Return list of supported measurements for station
@@ -46,9 +46,18 @@ class Station:
         Returns:
             List[str]: _description_
         """
-        # hash of key:measurement mapping
+        # hash of Result.key:formal measurement name mapping
+        #todo: wind gust is sloppy
         hash_map = {
-            'tide': 'Tide'
+            'tide': 'Tide',
+            'wind_spd': 'Wind Speed',
+            'wind_dir': 'Wind Direction',
+            'wind_gust': 'Wind Gust',
+            'water_temp': 'Water Temp',
+            'air_temp': 'Air Temp',
+            'air_press': 'Air Press',
+            'wave': 'Wave',
+            'conductivity': 'Conductivity',
         }
         # return list of measurements where True
         supported = []
