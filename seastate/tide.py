@@ -13,7 +13,7 @@ class TideApi(ApiMediator):
         """Constructor for TideApi, inherits the following from ApiMediator:
             .api - configured rest adapter
             .measurement - measurement type
-            .station - measurement station ID
+            .station - Station object
 
         Args:
             lat (float): _description_

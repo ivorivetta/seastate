@@ -32,7 +32,7 @@ class ApiMediator:
         self.api = (lat, lon, include, exclude) # pass to property setter
         
     @property
-    def api(self):
+    def api(self) -> str:
         return self._api
     
     @api.setter
@@ -74,21 +74,21 @@ class ApiMediator:
         # Find station closest to input coordinates using haversine
         # and is also active for specified measurement
         min = float('inf') # Initialize minimum pointer
-        for station in stations:
-            # skip if station is inactive
-            if not station.isActive:
+        for eval_station in stations:
+            # skip if eval_station is inactive
+            if not eval_station.isActive:
                 continue
             # skip if station does not support measurement
-            if measurement not in station.supported_measurements():
+            if measurement not in eval_station.supported_measurements():
                 continue
             # compute distance between SeaState coords and current station
-            new_val = haversine(lat, lon, station.lat, station.lon)
+            new_val = haversine(lat, lon, eval_station.lat, eval_station.lon)
             # if closer, update new minimum
             if new_val < min:
                 min = new_val
-                id = station.id
+                station = eval_station
                 api = station.api
-        return id, api
+        return station, api
 
 
 
