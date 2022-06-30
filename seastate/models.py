@@ -47,6 +47,7 @@ class Station:
             List[str]: _description_
         """
         # hash of Result.key:formal measurement name mapping
+        # this maps the object keys to the expected human readable input
         hash_map = {
             'tide': 'Tide',
             'wind_spd': 'Wind Speed',
@@ -65,22 +66,18 @@ class Station:
                 supported.append(hash_map[key])
         return supported
         
+    def isSupported(self, value:str) -> bool:
+        # Implemented this to always run comparison on lower case casting of strings
+        for x in self.supported_measurements():
+            if value.lower() in x.lower():
+                return True
+        return False
         
         
-        
+if __name__ == '__main__':
+    # Result tests
+    test = Result(200)
     
-# @dataclass
-# class Wave:
-#     wind_height: float
-#     wind_period: float
-#     swell_height: float
-#     swell_period: float
-#     # harmonic: list
-    
-# @dataclass
-# class Wind:
-#     wind_dir: float
-#     wind_spd: float
-#     wind_gust: float
-
-    
+    # Station Tests
+    test = Station()
+    # test internal methods

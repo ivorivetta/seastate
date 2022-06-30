@@ -1,7 +1,6 @@
 import numpy as np
-# from typing import List
 
-from exceptions import OceanSDKException
+from seastate.exceptions import OceanSDKException
 
 def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """ Returns distance in km using haversine method
