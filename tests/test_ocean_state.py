@@ -1,7 +1,7 @@
 from unittest import TestCase, mock
 from seastate.seastate import SeaState
 from seastate.models import Result
-from seastate.exceptions import OceanSDKException
+from seastate.exceptions import SeaStateException
 import requests
 
 def TestSeaState(TestCase):

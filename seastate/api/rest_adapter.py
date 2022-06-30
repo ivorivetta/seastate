@@ -5,7 +5,7 @@ from numpy import full
 
 import requests
 import requests.packages
-from seastate.exceptions import OceanSDKException
+from seastate.exceptions import SeaStateException
 from seastate.models import Result
 
 logging.basicConfig(level=logging.DEBUG)
@@ -37,9 +37,9 @@ class RestAdapter:
             data (Dict, optional): POST data. Defaults to None.
 
         Raises:
-            OceanSDKException: _description_
-            OceanSDKException: _description_
-            OceanSDKException: _description_
+            SeaStateException: _description_
+            SeaStateException: _description_
+            SeaStateException: _description_
 
         Returns:
             Result: Simplified http.Response object with:
@@ -64,7 +64,7 @@ class RestAdapter:
                 json=data)
         except requests.exceptions.RequestException as e:
             self._logger.error(msg=str(e))
-            raise OceanSDKException("Request Failed") from e
+            raise SeaStateException("Request Failed") from e
         # Parse JSON ouput to Python object or return failed Result on exception
         try:
             if '.txt' in full_url.lower():
@@ -81,7 +81,7 @@ class RestAdapter:
                 data_out = response.json()
         except (ValueError, JSONDecodeError) as e:
             self._logger.error(msg=log_line_post.format(False, None, e))
-            raise OceanSDKException("Bad JSON in Response") from e
+            raise SeaStateException("Bad JSON in Response") from e
         is_success = 299 >= response.status_code >= 200
         log_line = log_line_post.format(is_success, response.status_code, response.reason)
         # if status code in 200-299 range, return Result, else raise exception
@@ -89,7 +89,7 @@ class RestAdapter:
             self._logger.debug(msg=log_line)
             return Result(response.status_code, message=response.reason, data=data_out)
         self._logger.error(msg=log_line)
-        raise OceanSDKException(f"{response.status_code}: {response.reason}")
+        raise SeaStateException(f"{response.status_code}: {response.reason}")
 
 
     def get(self, endpoint: str, ep_params: Dict = None) -> Result:

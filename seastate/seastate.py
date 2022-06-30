@@ -4,7 +4,8 @@ from typing import Dict, Union
 
 from pandas import DataFrame
 
-from exceptions import OceanSDKException
+from exceptions import SeaStateException
+from seastate.api.api_mediator import ApiMediator
 from tide import TideApi
 from wind import WindApi
 
@@ -17,7 +18,7 @@ class SeaState:
         self.lon = float(lon)
         self.include = list(include)
         self.exclude = list(exclude)
-        self.tide = TideApi(self.lat, self.lon, self.include, self.exclude)
+        self.tide = ApiMediator(self.lat, self.lon, self.include, self.exclude)
         self.wind = WindApi(self.lat, self.lon, self.include, self.exclude)
         
     def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:

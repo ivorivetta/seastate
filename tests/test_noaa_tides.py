@@ -1,7 +1,7 @@
 from unittest import TestCase, mock
 from seastate.noaa_tides import TideApi
 from seastate.models import Result
-from seastate.exceptions import OceanSDKException
+from seastate.exceptions import SeaStateException
 import requests
 
 def TestTideApi(TestCase):

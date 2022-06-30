@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, Tuple
 
 from seastate.api.datasources import DataSources
-from seastate.exceptions import OceanSDKException
+from seastate.exceptions import SeaStateException
 from seastate.models import Result, Station
 from seastate.utils import haversine
 
@@ -45,7 +45,7 @@ class ApiMediator:
         if -90 < value < 90:
             self.__target_lat = value
         else:
-            raise OceanSDKException("Latitude must be between -90 and 90 degrees")
+            raise SeaStateException("Latitude must be between -90 and 90 degrees")
     
     @property
     def _target_lon(self):
@@ -57,7 +57,7 @@ class ApiMediator:
         if -180 < value < 180:
             self._target_lon = value
         else:
-            raise OceanSDKException("Longitude must be between -180 and 180 degrees")
+            raise SeaStateException("Longitude must be between -180 and 180 degrees")
 
     def nearest_station(self) -> Station:
         # Return dict of stations
@@ -66,7 +66,7 @@ class ApiMediator:
             # Grab all stations
             stations = DataSources().all()
         except (KeyError) as e:
-            raise OceanSDKException("Error retrieving stations") from e
+            raise SeaStateException("Error retrieving stations") from e
 
         # Find station closest to input coordinates using haversine
         # and is also active for specified measurement

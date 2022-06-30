@@ -1,7 +1,7 @@
 from unittest import TestCase, mock
 from seastate.rest_adapter import RestAdapter
 from seastate.models import Result
-from seastate.exceptions import OceanSDKException
+from seastate.exceptions import SeaStateException
 import requests
 
 class TestRestAdapter(TestCase):
@@ -17,11 +17,11 @@ class TestRestAdapter(TestCase):
             result = self.rest_adapter._do('GET', '')
             self.assertIsInstance(result, Result)
     
-    def test__do_bad_json_raises_oceansdkexception(self):
+    def test__do_bad_json_raises_SeaStateException(self):
         bad_json = '{"bad json": '
         self.response._content = bad_json
         with mock.patch("requests.request", return_value=self.response):
-            with self.assertRaises(OceanSDKException):
+            with self.assertRaises(SeaStateException):
                 self.rest_adapter._do('GET', '')
         
         

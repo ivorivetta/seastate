@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from seastate.api.rest_adapter import RestAdapter
-from seastate.exceptions import OceanSDKException
+from seastate.exceptions import SeaStateException
 from seastate.models import Result
 
 logging.basicConfig(level=logging.DEBUG)
@@ -31,7 +31,7 @@ class TidesAndCurrentsApi:
 
 
         Raises:
-            OceanSDKException: _description_
+            SeaStateException: _description_
 
         Returns:
             Result: _description_
@@ -62,7 +62,7 @@ class TidesAndCurrentsApi:
         elif 'tide_prediction' in measurement:
             product = key = 'predictions'
         else:
-            raise OceanSDKException("Unsupported measurement requested")
+            raise SeaStateException("Unsupported measurement requested")
 
         
         ep_params = {
@@ -86,7 +86,7 @@ class TidesAndCurrentsApi:
             data = result.data[key]
         except (KeyError) as e:
             self._logger.error(result.data)
-            raise OceanSDKException("TidesAndCurrentsApi unpacking error") from e
+            raise SeaStateException("TidesAndCurrentsApi unpacking error") from e
         result = Result(status_code=result.status_code, message = result.message, data=data)
         
         return result

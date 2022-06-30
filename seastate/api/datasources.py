@@ -7,7 +7,7 @@ import requests
 from seastate.api.rest_adapter import RestAdapter
 from seastate.api.noaa_ndbc import NdbcApi
 from seastate.api.noaa_tidesandcurrents import TidesAndCurrentsApi
-from seastate.exceptions import OceanSDKException
+from seastate.exceptions import SeaStateException
 from seastate.models import Station
 
 
@@ -80,7 +80,7 @@ class DataSources:
         """Parse xml doc
 
         Raises:
-            OceanSDKException: _description_
+            SeaStateException: _description_
 
         Returns:
             List[Station]: _description_
@@ -133,7 +133,7 @@ class DataSources:
             
         # Check parsing was succesful
         if len(stations) == 0:
-            raise OceanSDKException("No stations successfully parsed, please submit issue")
+            raise SeaStateException("No stations successfully parsed, please submit issue")
         return stations
     
 

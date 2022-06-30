@@ -3,7 +3,7 @@ from datetime import datetime
 
 from api.api_mediator import ApiMediator
 
-from exceptions import OceanSDKException
+from exceptions import SeaStateException
 from models import Result
 
 logging.basicConfig(level=logging.DEBUG)

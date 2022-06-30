@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 
 from seastate.api.rest_adapter import RestAdapter
-from seastate.exceptions import OceanSDKException
+from seastate.exceptions import SeaStateException
 from seastate.models import Result
 
 
@@ -28,7 +28,7 @@ class NdbcApi:
             end (datetime): end datetime.
 
         Raises:
-            OceanSDKException: _description_
+            SeaStateException: _description_
 
         Returns:
             Result: _description_
@@ -41,7 +41,7 @@ class NdbcApi:
             result = self._rest_adapter.get(endpoint=endpoint,ep_params=ep_params)
         else:
             # todo: handle endpoint for archival data
-            raise OceanSDKException("ndbc time range exceeded")
+            raise SeaStateException("ndbc time range exceeded")
             
         # endpoint param formatting
         begin_date = f"{start.year}{start.month:02}{start.day:02}"
@@ -68,7 +68,7 @@ class NdbcApi:
             data = result.data['predictions']   # key for tide predictions
         except (KeyError) as e:
             self._logger.error(result.data)
-            raise OceanSDKException("NdbcApi unpacking error") from e
+            raise SeaStateException("NdbcApi unpacking error") from e
         
         result = Result(status_code=result.status_code, message = result.message, data=data)
         return result
