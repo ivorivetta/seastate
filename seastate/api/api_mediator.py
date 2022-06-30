@@ -34,18 +34,43 @@ class ApiMediator:
         self.station = self.nearest_station()
         self.api = self.station.api
         self.distance = haversine(self._target_lat,self._target_lon, self.station.lat, self.station.lon)
+        
+    @property
+    def _target_lat(self):
+        return self.__target_lat
+    
+    @_target_lat.setter
+    def _target_lat(self,value):
+        #  Latitudes are in range of -90 to 90
+        if -90 < value < 90:
+            self.__target_lat = value
+        else:
+            raise OceanSDKException("Latitude must be between -90 and 90 degrees")
+    
+    @property
+    def _target_lon(self):
+        return self._target_lon
+    
+    @_target_lon.setter
+    def _target_lon(self,value):
+        #  Longitudes are in range of -180 to 180
+        if -180 < value < 180:
+            self._target_lon = value
+        else:
+            raise OceanSDKException("Longitude must be between -180 and 180 degrees")
 
     def nearest_station(self) -> Station:
         # Return dict of stations
         # n<2000 so just return them all
         try:
-            # Return all stations
+            # Grab all stations
             stations = DataSources().all()
         except (KeyError) as e:
             raise OceanSDKException("Error retrieving stations") from e
 
         # Find station closest to input coordinates using haversine
         # and is also active for specified measurement
+        # todo: implement include/exclude filtering
         min = float('inf') # Initialize minimum pointer
         for eval_station in stations:
             # skip if eval_station is inactive
