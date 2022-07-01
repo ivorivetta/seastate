@@ -20,12 +20,12 @@ class TidesAndCurrentsApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter('api.tidesandcurrents.noaa.gov/', api_key, ssl_verify, logger)
         
-    def hourly(self, measurement:str, station:str, start:datetime, end: datetime) -> Result:
-        """Returns Result for stationID and datetime start and end. Args should be validated externally
+    def measurement_from_date_range(self, measurement:str, station_id:str, start:datetime, end: datetime) -> Result:
+        """Returns Result for station ID and datetime start and end. Args should be validated externally
 
         Args:
-            measurement (str): measurement type can be tide|wind|water_temp|air_temp.
-            station (str): Station ID.
+            measurement (str): measurement type can be tide|wind|water_temp|air_temp|air_press|conductivity|tide_prediction.
+            station_id (str): Station ID.
             start (datetime): start datetime.
             end (datetime): end datetime.
 
@@ -36,22 +36,21 @@ class TidesAndCurrentsApi:
         Returns:
             Result: _description_
         """
-        # datetime formatting for endpoint param
-        begin_date = f"{start.year}{start.month:02}{start.day:02}"
-        end_date = f"{end.year}{end.month:02}{end.day:02}"
         
-        # measurement type string handling for endpoint and result unpacking
+        # each measurement type will have a different endpoint "product" param and key to unpack response
+        # always test str on lowercase casting
+        measurement = measurement.lower()
         if 'tide' in measurement:
             product = 'water_level'
             key = 'data'
         elif 'wind' in measurement:
             product = 'wind'
             key = 'data'
-        elif 'air_temp' in measurement:
-            product = 'air_temperature'
-            key = 'data'
         elif 'water_temp' in measurement:
             product = 'water_temperature'
+            key = 'data'
+        elif 'air_temp' in measurement:
+            product = 'air_temperature'
             key = 'data'
         elif 'air_press' in measurement:
             product = 'air_pressure'
@@ -64,11 +63,14 @@ class TidesAndCurrentsApi:
         else:
             raise SeaStateException("Unsupported measurement requested")
 
+        # formatting datetime to endpoint param
+        begin_date = f"{start.year}{start.month:02}{start.day:02}"
+        end_date = f"{end.year}{end.month:02}{end.day:02}"
         
         ep_params = {
             'begin_date': begin_date,
             'end_date': end_date,
-            'station': str(station),
+            'station': str(station_id),
             'product': product,
             'interval': 'h',
             'datum': 'MTL',
@@ -81,7 +83,9 @@ class TidesAndCurrentsApi:
         # Call endpoint
         result = self._rest_adapter.get(endpoint='api/prod/datagetter?',ep_params=ep_params)
         
-        # unpack
+        # unpack to return specified measurement
+        # since TidesAndCurrents returns 1 product per endpoint, no need to parse, just unpack Json
+        # details here: https://api.tidesandcurrents.noaa.gov/api/prod/responseHelp.html
         try:
             data = result.data[key]
         except (KeyError) as e:

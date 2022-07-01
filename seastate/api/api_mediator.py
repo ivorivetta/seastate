@@ -49,13 +49,13 @@ class ApiMediator:
     
     @property
     def _target_lon(self):
-        return self._target_lon
+        return self.__target_lon
     
     @_target_lon.setter
     def _target_lon(self,value):
         #  Longitudes are in range of -180 to 180
         if -180 < value < 180:
-            self._target_lon = value
+            self.__target_lon = value
         else:
             raise SeaStateException("Longitude must be between -180 and 180 degrees")
 

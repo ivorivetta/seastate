@@ -19,7 +19,7 @@ class NdbcApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter('https://www.ndbc.noaa.gov/', api_key, ssl_verify, logger)
         
-    def measurements_hourly(self, station:str, start:datetime, end: datetime) -> Result:
+    def measurement_from_daterange(self, station:str, start:datetime, end: datetime) -> Result:
         """Returns Result for stationID and datetime start and end
 
         Args:

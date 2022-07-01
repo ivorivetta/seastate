@@ -4,10 +4,8 @@ from typing import Dict, Union
 
 from pandas import DataFrame
 
-from exceptions import SeaStateException
+from seastate.exceptions import SeaStateException
 from seastate.api.api_mediator import ApiMediator
-from tide import TideApi
-from wind import WindApi
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -18,8 +16,8 @@ class SeaState:
         self.lon = float(lon)
         self.include = list(include)
         self.exclude = list(exclude)
-        self.tide = ApiMediator(self.lat, self.lon, self.include, self.exclude)
-        self.wind = WindApi(self.lat, self.lon, self.include, self.exclude)
+        self.tide = ApiMediator('Tide', self.lat, self.lon, self.include, self.exclude)
+        self.wind = ApiMediator('Wind', self.lat, self.lon, self.include, self.exclude)
         
     def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
         # Process timeframe
@@ -51,7 +49,4 @@ class SeaState:
 
 if __name__ == '__main__':
     test = SeaState(32,-117)
-    result = test.hourly()
-    print(result)
-    import pdb
-    pdb.set_trace()
+    pass

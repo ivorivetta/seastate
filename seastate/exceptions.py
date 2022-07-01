@@ -1,2 +1,2 @@
-class OceanSDKException(Exception):
+class SeaStateException(Exception):
     pass
