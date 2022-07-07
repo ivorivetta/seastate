@@ -54,11 +54,11 @@ class TidesAndCurrentsApi:
         elif 'air_press' in measurement:
             product = 'air_pressure'
             measurement_key = 'data'
+        elif 'wave' in measurement:
+            raise SeaStateException("Unsupported measurement requested")
         elif 'conductivity' in measurement:
             product = 'conductivity'
             measurement_key = 'data'
-        elif 'tide_prediction' in measurement:
-            product = measurement_key = 'predictions'
         else:
             raise SeaStateException("Unsupported measurement requested")
 
@@ -86,6 +86,7 @@ class TidesAndCurrentsApi:
         # unpack to return specified measurement
         # since TidesAndCurrents returns 1 product per endpoint, no need to parse, just unpack Json
         # details here: https://api.tidesandcurrents.noaa.gov/api/prod/responseHelp.html
+        # 
         try:
             data = result.data[measurement_key]
         except (KeyError) as e:
@@ -104,7 +105,7 @@ class TidesAndCurrentsApi:
         
 if __name__ == '__main__':
     api = TidesAndCurrentsApi()
-    result = api.hourly(9410230, datetime.today(),datetime.today(),'wind')
+    result = api.hourly('wind',9410230, datetime.today(),datetime.today())
     print(result)
     # result = api.hourly(9410230, datetime.today(),datetime.today(),'air_temp')
     # print(result)

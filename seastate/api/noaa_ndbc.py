@@ -47,9 +47,10 @@ class NdbcApi:
             measurement_key = 'ATMP'
         elif 'air_press' in measurement:
             measurement_key = 'PRES'
+        elif 'wave' in measurement:
+            #todo handle swell information
+            measurement_key = 'WVHT'
         elif 'conductivity' in measurement:
-            raise SeaStateException("Unsupported measurement requested, please report issue")
-        elif 'tide_prediction' in measurement:
             raise SeaStateException("Unsupported measurement requested, please report issue")
         else:
             raise SeaStateException("Unsupported measurement requested, please report issue")

@@ -16,8 +16,13 @@ class SeaState:
         self.lon = float(lon)
         self.include = list(include)
         self.exclude = list(exclude)
-        self.tide = ApiMediator('Tide', self.lat, self.lon, self.include, self.exclude)
-        self.wind = ApiMediator('Wind', self.lat, self.lon, self.include, self.exclude)
+        self.tide = ApiMediator('tide', self.lat, self.lon, self.include, self.exclude)
+        self.wind = ApiMediator('wind', self.lat, self.lon, self.include, self.exclude)
+        self.water_temp = ApiMediator('water_temp', self.lat, self.lon, self.include, self.exclude)
+        self.air_temp = ApiMediator('air_temp', self.lat, self.lon, self.include, self.exclude)
+        self.air_press = ApiMediator('air_press', self.lat, self.lon, self.include, self.exclude)
+        self.wave = ApiMediator('wave', self.lat, self.lon, self.include, self.exclude)
+        self.conductivity = ApiMediator('conductivity', self.lat, self.lon, self.include, self.exclude)
         
     def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
         # Process timeframe
@@ -36,7 +41,8 @@ class SeaState:
         
         # Get data
         data = {}
-        for api_key in ['tide', 'wind']:
+        #todo: have a class property that summarizes the active apis for this list
+        for api_key in ['tide', 'wind', 'water_temp', 'air_temp', 'air_press', 'wave', 'conductivity']:
             # access the configured api to generate response with hourly method 
             data[api_key] = self.__getattribute__(api_key).api.hourly(
                 measurement = self.__getattribute__(api_key).measurement,

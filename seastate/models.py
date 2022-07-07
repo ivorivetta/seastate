@@ -1,6 +1,17 @@
 from dataclasses import dataclass
 from typing import List, Dict, Any
 
+# the implemented measurements for 
+valid_measurements = {
+    'tide',
+    'wind',
+    'water_temp',
+    'air_temp',
+    'air_press',
+    'wave',
+    'conductivity',
+}
+
 @dataclass
 class Result:
     """Simplified requests.Response returned from RestAdapter
@@ -24,9 +35,9 @@ class Station:
     lon: float
     api: Any
     tide: bool = False
-    wind_spd: bool = False
-    wind_dir: bool = False
-    wind_gust: bool = False
+    wind: bool = False
+    # wind_dir: bool = False #todo: increase granularity of station datamodel
+    # wind_gust: bool = False
     water_temp: bool = False
     air_temp: bool = False
     air_press: bool = False
@@ -46,30 +57,17 @@ class Station:
         Returns:
             List[str]: _description_
         """
-        # hash of Result.key:formal measurement name mapping
-        # this maps the object keys to the expected human readable input
-        hash_map = {
-            'tide': 'Tide',
-            'wind_spd': 'Wind Speed',
-            'wind_dir': 'Wind Direction',
-            'wind_gust': 'Wind Gust',
-            'water_temp': 'Water Temp',
-            'air_temp': 'Air Temp',
-            'air_press': 'Air Press',
-            'wave': 'Wave',
-            'conductivity': 'Conductivity',
-        }
-        # return list of measurements where True
+        # 
         supported = []
-        for key in hash_map:
+        for key in valid_measurements:
             if self.__getattribute__(key):
-                supported.append(hash_map[key])
+                supported.append(key)
         return supported
         
     def isSupported(self, value:str) -> bool:
         # Implemented this to always run comparison on lower case casting of strings
         for x in self.supported_measurements():
-            if value.lower() in x.lower():
+            if value in x:
                 return True
         return False
         

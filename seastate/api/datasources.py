@@ -3,7 +3,6 @@ from html.parser import HTMLParser
 from typing import List
 
 import defusedxml.minidom
-import requests
 from seastate.api.rest_adapter import RestAdapter
 from seastate.api.noaa_ndbc import NdbcApi
 from seastate.api.noaa_tidesandcurrents import TidesAndCurrentsApi
@@ -55,7 +54,6 @@ class DataSources:
                 self._logger.info("No station info in this line: " + str(line))
                 continue
 
-            
             # parse stationID, gps, and confirm active measurement sources
             # 'MM' is NOAA's notation for missing measurement
             stations.append(Station(
@@ -64,13 +62,13 @@ class DataSources:
                 lon= float(line[2]),
                 api= NdbcApi(),
                 tide= True if line[21] != 'MM' else False,
-                wind_spd= True if line[8] != 'MM' else False,
-                wind_dir= True if line[9] != 'MM' else False,
-                wind_gust= True if line[10] != 'MM' else False,
+                wind= True if line[8] != 'MM' else False,
+                # wind_dir= True if line[9] != 'MM' else False,
+                # wind_gust= True if line[10] != 'MM' else False,
                 water_temp= True if line[18] != 'MM' else False,
                 air_temp= True if line[17] != 'MM' else False,
                 air_press= True if line[15] != 'MM' else False,
-                wave= True if line[11] or line[12] or line[13] or line[14] != 'MM' else False,
+                wave= True if line[11] != 'MM' else False,
             ))
         
         # return list of stations
@@ -115,7 +113,7 @@ class DataSources:
                 if 'Water Level' in name and status:
                     foo['tide'] = True
                 elif 'Winds' in name and status:
-                    foo['wind_spd'] = True
+                    foo['wind'] = True
                     # todo: wind dir and gust may or may not be true
                 elif 'Air Temp' in name and status:
                     foo['air_temp'] = True
@@ -135,7 +133,6 @@ class DataSources:
         if len(stations) == 0:
             raise SeaStateException("No stations successfully parsed, please submit issue")
         return stations
-    
 
 if __name__ == '__main__':
     tnc = DataSources().tides_and_currents_stations()
