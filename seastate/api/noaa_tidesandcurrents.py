@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Dict
 
 from seastate.api.rest_adapter import RestAdapter
 from seastate.exceptions import SeaStateException
@@ -12,15 +13,14 @@ class TidesAndCurrentsApi:
         """Constructor for TidesAndCurrentsApi, composed with RestAdapter 
 
         Args:
-            hostname (str, optional): Set to api.tidesandcurrents.noaa.gov.
-            api_key (str, optional): Not used. Defaults to ''.
+            api_key (str, optional): Not used here. Defaults to ''.
             ssl_verify (bool, optional): Defaults to True.
             logger (logging.Logger, optional): Pass explictly else will be created with __name__.
         """
         self._logger = logger or logging.getLogger(__name__)
-        self._rest_adapter = RestAdapter('api.tidesandcurrents.noaa.gov/', api_key, ssl_verify, logger)
+        self._rest_adapter = RestAdapter('api.tidesandcurrents.noaa.gov', api_key, ssl_verify, logger)
         
-    def measurement_from_date_range(self, measurement:str, station_id:str, start:datetime, end: datetime) -> Result:
+    def measurements_from_date_range(self, measurement:str, station_id:str, start:datetime, end: datetime) -> Result:
         """Returns Result for station ID and datetime start and end. Args should be validated externally
 
         Args:
@@ -28,7 +28,6 @@ class TidesAndCurrentsApi:
             station_id (str): Station ID.
             start (datetime): start datetime.
             end (datetime): end datetime.
-
 
         Raises:
             SeaStateException: _description_
@@ -42,24 +41,24 @@ class TidesAndCurrentsApi:
         measurement = measurement.lower()
         if 'tide' in measurement:
             product = 'water_level'
-            key = 'data'
+            measurement_key = 'data'
         elif 'wind' in measurement:
             product = 'wind'
-            key = 'data'
+            measurement_key = 'data'
         elif 'water_temp' in measurement:
             product = 'water_temperature'
-            key = 'data'
+            measurement_key = 'data'
         elif 'air_temp' in measurement:
             product = 'air_temperature'
-            key = 'data'
+            measurement_key = 'data'
         elif 'air_press' in measurement:
             product = 'air_pressure'
-            key = 'data'
+            measurement_key = 'data'
         elif 'conductivity' in measurement:
             product = 'conductivity'
-            key = 'data'
+            measurement_key = 'data'
         elif 'tide_prediction' in measurement:
-            product = key = 'predictions'
+            product = measurement_key = 'predictions'
         else:
             raise SeaStateException("Unsupported measurement requested")
 
@@ -81,19 +80,26 @@ class TidesAndCurrentsApi:
         }
         
         # Call endpoint
-        result = self._rest_adapter.get(endpoint='api/prod/datagetter?',ep_params=ep_params)
+        endpoint='api/prod/datagetter?'
+        result = self._rest_adapter.get(endpoint=endpoint,ep_params=ep_params)
         
         # unpack to return specified measurement
         # since TidesAndCurrents returns 1 product per endpoint, no need to parse, just unpack Json
         # details here: https://api.tidesandcurrents.noaa.gov/api/prod/responseHelp.html
         try:
-            data = result.data[key]
+            data = result.data[measurement_key]
         except (KeyError) as e:
             self._logger.error(result.data)
             raise SeaStateException("TidesAndCurrentsApi unpacking error") from e
-        result = Result(status_code=result.status_code, message = result.message, data=data)
         
-        return result
+        return Result(status_code=result.status_code, message = result.message, data=data)
+    
+    def hourly(self, measurement:str, station_id:str, start:datetime, end: datetime) -> Dict:
+        result = self.measurements_from_date_range(measurement, station_id, start, end)
+        # todo: filter results hourly
+        if result.status_code == 200:
+            return result.data
+        pass
 
         
 if __name__ == '__main__':

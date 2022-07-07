@@ -35,18 +35,19 @@ class SeaState:
             end = datetime.today()
         
         # Get data
-        # todo: if status_code is good, return
-        tide = self.tide.hourly(start, end)
-        return tide
-    
-    # def hourly_df(self, start: datetime = None, end: datetime = None) -> Dict:
-    #     data = self.hourly(start,end)
-        
-    #     # todo: unpack into dataframe
-    #     df = DataFrame()
-        
+        data = {}
+        for api_key in ['tide', 'wind']:
+            # access the configured api to generate response with hourly method 
+            data[api_key] = self.__getattribute__(api_key).api.hourly(
+                measurement = self.__getattribute__(api_key).measurement,
+                station_id = self.__getattribute__(api_key).station.id,
+                start = start,
+                end = end)
         return data
 
 if __name__ == '__main__':
     test = SeaState(32,-117)
+    start = datetime(2022,7,5)
+    end = datetime(2022,7,5)
+    a = test.hourly(start,end)
     pass

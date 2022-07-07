@@ -35,6 +35,7 @@ class ApiMediator:
         self.api = self.station.api
         self.distance = haversine(self._target_lat,self._target_lon, self.station.lat, self.station.lon)
         
+    ## Properties
     @property
     def _target_lat(self):
         return self.__target_lat
@@ -59,6 +60,7 @@ class ApiMediator:
         else:
             raise SeaStateException("Longitude must be between -180 and 180 degrees")
 
+    # # Methods
     def nearest_station(self) -> Station:
         # Return dict of stations
         # n<2000 so just return them all

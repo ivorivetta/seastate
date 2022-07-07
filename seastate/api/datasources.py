@@ -34,7 +34,7 @@ class DataSources:
         # check station status by retrieving latest measurements from all stations
         result = RestAdapter('www.ndbc.noaa.gov/').get('data/latest_obs/latest_obs.txt')
         
-        # loop through text lines and parse data
+        # loop through text lines and test if station is ouputting specified measurement
         stations = []
         for i, value in enumerate(result.data.split('\n')):
             # skipping 2 header lines

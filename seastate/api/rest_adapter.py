@@ -21,7 +21,7 @@ class RestAdapter:
             logger (logging.Logger, optional): Pass explictly else will be created with __name__.
         """
         self._logger = logger or logging.getLogger(__name__)
-        self.url = f"https://{hostname}"
+        self.url = f"https://{hostname}/"
         self._api_key = api_key
         self._ssl_verify = ssl_verify
         if not ssl_verify:
