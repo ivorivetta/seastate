@@ -1,12 +1,9 @@
 import logging
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 
 from seastate.api.rest_adapter import RestAdapter
 from seastate.exceptions import SeaStateException
-from seastate.models import Result
-
-logging.basicConfig(level=logging.DEBUG)
 
 class TidesAndCurrentsApi:
     def __init__(self, api_key: str = '', ssl_verify: bool = True, logger: logging.Logger = None):
@@ -20,7 +17,7 @@ class TidesAndCurrentsApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter('api.tidesandcurrents.noaa.gov', api_key, ssl_verify, logger)
         
-    def measurements_from_date_range(self, measurement:str, station_id:str, start:datetime, end: datetime) -> Result:
+    def measurements_from_date_range(self, measurement:str, station_id:str, start:datetime, end: datetime) -> List[Dict]:
         """Returns Result for station ID and datetime start and end. Args should be validated externally
 
         Args:
@@ -93,9 +90,9 @@ class TidesAndCurrentsApi:
             self._logger.error(result.data)
             raise SeaStateException("TidesAndCurrentsApi unpacking error") from e
         
-        return Result(status_code=result.status_code, message = result.message, data=data)
+        return data
     
-    def hourly(self, measurement:str, station_id:str, start:datetime, end: datetime) -> Dict:
+    def hourly(self, measurement:str, station_id:str, start:datetime, end: datetime) -> List[Dict]:
         result = self.measurements_from_date_range(measurement, station_id, start, end)
         # todo: filter results hourly
         if result.status_code == 200:

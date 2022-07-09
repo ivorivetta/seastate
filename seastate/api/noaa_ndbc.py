@@ -1,11 +1,9 @@
 import logging
 from datetime import datetime, timedelta
+from typing import Dict, List
 
 from seastate.api.rest_adapter import RestAdapter
 from seastate.exceptions import SeaStateException
-from seastate.models import Result
-from typing import Dict, List
-
 
 class NdbcApi:
     def __init__(self, api_key: str = '', ssl_verify: bool = True, logger: logging.Logger = None):
@@ -23,7 +21,7 @@ class NdbcApi:
         pass
         
         
-    def measurements_from_date_range(self, measurement:str, station_id:str, start:datetime, end: datetime) -> Result:
+    def measurements_from_date_range(self, measurement:str, station_id:str, start:datetime, end: datetime) -> List[Dict]:
         """Returns Result for stationID and datetime start and end
 
         Args:
@@ -66,18 +64,29 @@ class NdbcApi:
         if start > archive_cutoff_date or end > archive_cutoff_date:
             # "realtime" endpoint covers prev 45 days
             endpoints += [f"data/realtime2/{station_id}.txt"]
-        # daterange spans archive
+        # daterange spans archive, for current year
+        # cutoff month has a unique endpoint
+        if start < archive_cutoff_date < end:
+            requested_months = [archive_cutoff_date.strftime("%b")]
+            endpoints += [f"data/stdmet/{x}/{station_id}.txt" for x in requested_months]
         # within current year, endpoints are grouped by month
-        if start < archive_cutoff_date and archive_cutoff_date.year == datetime.today().year:
+        if start < archive_cutoff_date and end.year == datetime.today().year:
             # use January if start year precedes the archive cutoff year
             # else use start month
             start_range = 1 if start.year < archive_cutoff_date.year else start.month
-            # Endpoint uses abbreviated month designations
-            requested_months = [datetime(month=x).strftime("%b") for x in range(start_range,archive_cutoff_date.month)]
-            endpoints += [f"data/stdmet/{x}/{station_id}.txt" for x in requested_months]
-        # prior years are collated into years
+            # end of range will be up to cutoff
+            # duplicates to be filtered downstream
+            end_range = archive_cutoff_date.month
+            # Endpoint uses month number and abbreviated month designations (%b)
+            requested_months = [(str(x), datetime(1,x,1).strftime("%b")) for x in range(start_range,end_range)]
+            endpoints += [f"view_text_file.php?filename={station_id}{x}{datetime.today().year}.txt.gz&dir=data/stdmet/{y}/" for x, y in requested_months]
+        # daterange spans prior years
+        # 
         if start < archive_cutoff_date and start.year < datetime.today().year:
-            requested_years = [str(x) for x in range(start.year,end.year)]
+            # if end year is this year, handled upstream
+            # else, it is a prior year and needs to be included
+            end_range = end.year if end.year == datetime.today().year else end.year + 1
+            requested_years = [str(x) for x in range(start.year,end_range)]
             endpoints += [f"view_text_file.php?filename={station_id}h{x}.txt.gz&dir=data/historical/stdmet/" for x in requested_years]
 
         result = ''
@@ -96,7 +105,7 @@ class NdbcApi:
         # todo: unpack text file into t: and v:
         try:
             data = []
-            for i, value in enumerate(result.data.split('\n')):
+            for i, value in enumerate(result.split('\n')):
                 # turn str to list
                 # known anomaly: 2 space characters sometimes delimiting 
                 line = value.replace('  ', ' ').split(' ')
@@ -104,6 +113,11 @@ class NdbcApi:
                     line.remove(' ') #remove blanks
                 while '' in line:
                     line.remove('') #remove blanks
+                
+                # handle corrupted lines
+                if len(line) == 0:
+                    self._logger.info(f"ignoring line #{i}:{str(line)}")
+                    continue
                 
                 # handle header lines
                 if line[0] in ['#YY', 'YY']:
@@ -115,11 +129,7 @@ class NdbcApi:
                 elif line[0] in ['#yr']:
                     # skipping units line
                     continue
-                
-                # handle corrupted lines
-                if len(line) == 0:
-                    self._logger.info(f"ignoring line #{i}:{str(line)}")
-                    continue
+
                 
                 # skip lines outside of daterange
                 if not start.year <= int(line[0]) <= end.year:
@@ -149,9 +159,9 @@ class NdbcApi:
             self._logger.error(result.data)
             raise SeaStateException("NdbcApi unpacking error") from e
 
-        return Result(status_code=result.status_code, message = result.message, data=data)
+        return data
 
-    def hourly(self, measurement:str, station_id:str, start:datetime, end: datetime) -> Dict:
+    def hourly(self, measurement:str, station_id:str, start:datetime, end: datetime) -> List[Dict]:
         result = self.measurements_from_date_range(measurement, station_id, start, end)
         # todo: filter results hourly
         if result.status_code == 200:
@@ -160,8 +170,18 @@ class NdbcApi:
         
 if __name__ == '__main__':
     api = NdbcApi()
-    # check daterange = today
-    result = api.hourly('wind',46224,datetime.today(),datetime.today())
+    # check daterange within realtime
+    # result = api.hourly('wind',46224,datetime.today(),datetime.today()-timedelta(days=2))
+    
+    # check daterange for request only in prior years
+    # result = api.hourly('wind',46224,datetime.today()-timedelta(days=2*365+30),datetime.today()-timedelta(days=1*365+30))
+
+    # check daterange spanning archive and realtime, into prior year
+    result = api.hourly('wind',46224,datetime.today()-timedelta(days=365+30),datetime.today())
+    
+ 
+    
+    
     # check
     pass
     # import pdb
