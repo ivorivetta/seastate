@@ -56,20 +56,23 @@ class DataSources:
 
             # parse stationID, gps, and confirm active measurement sources
             # 'MM' is NOAA's notation for missing measurement
-            stations.append(Station(
-                id= line[0],
-                lat= float(line[1]),
-                lon= float(line[2]),
-                api= NdbcApi(),
-                tide= True if line[21] != 'MM' else False,
-                wind= True if line[8] != 'MM' else False,
+            temp_station = {
+                'id': line[0],
+                'lat': float(line[1]),
+                'lon': float(line[2]),
+                'api': NdbcApi(),
+                'tide': True if line[21] != 'MM' else False,
+                'wind': True if line[8] != 'MM' else False,
                 # wind_dir= True if line[9] != 'MM' else False,
                 # wind_gust= True if line[10] != 'MM' else False,
-                water_temp= True if line[18] != 'MM' else False,
-                air_temp= True if line[17] != 'MM' else False,
-                air_press= True if line[15] != 'MM' else False,
-                wave= True if line[11] != 'MM' else False,
-            ))
+                'water_temp': True if line[18] != 'MM' else False,
+                'air_temp': True if line[17] != 'MM' else False,
+                'air_press': True if line[15] != 'MM' else False,
+                'wave': True if line[11] != 'MM' else False,
+            }
+            
+            # construct station with temp var
+            stations.append(Station(**temp_station))
         
         # return list of stations
         return stations
@@ -93,14 +96,14 @@ class DataSources:
         # traverse station elements to build Station objects
         stations = []
         for line in station_elements:
-            foo = {}
+            temp_station = {}
             # parse station metadata into temporary dict
             try:
-                foo['name'] = line.getAttribute('name')
-                foo['id'] = line.getAttribute('ID')
-                foo['lat'] = float(line.getElementsByTagName('lat')[0].firstChild.nodeValue)
-                foo['lon'] = float(line.getElementsByTagName('long')[0].firstChild.nodeValue)
-                foo['api'] = TidesAndCurrentsApi()
+                temp_station['name'] = line.getAttribute('name')
+                temp_station['id'] = line.getAttribute('ID')
+                temp_station['lat'] = float(line.getElementsByTagName('lat')[0].firstChild.nodeValue)
+                temp_station['lon'] = float(line.getElementsByTagName('long')[0].firstChild.nodeValue)
+                temp_station['api'] = TidesAndCurrentsApi()
             except (IndexError) as e:
                 # Faulty station, skip station node
                 # todo: refactor into object to properly log parsing errors
@@ -111,23 +114,23 @@ class DataSources:
                 name = m.attributes['name'].value
                 status = True if m.attributes['status'].value == '1' else False
                 if 'Water Level' in name and status:
-                    foo['tide'] = True
+                    temp_station['tide'] = True
                 elif 'Winds' in name and status:
-                    foo['wind'] = True
+                    temp_station['wind'] = True
                     # todo: wind dir and gust may or may not be true
                 elif 'Air Temp' in name and status:
-                    foo['air_temp'] = True
+                    temp_station['air_temp'] = True
                 elif 'Water Temp' in name and status:
-                    foo['water_temp'] = True
+                    temp_station['water_temp'] = True
                 elif 'Air Pressure' in name and status:
-                    foo['air_press'] = True
+                    temp_station['air_press'] = True
                 elif 'Conductivity' in name and status:
-                    foo['conductivity'] = True
+                    temp_station['conductivity'] = True
                 else:
                     pass          
 
             # construct station with temp var
-            stations.append(Station(**foo))
+            stations.append(Station(**temp_station))
             
         # Check parsing was succesful
         if len(stations) == 0:
