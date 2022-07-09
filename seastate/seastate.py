@@ -29,6 +29,7 @@ class SeaState:
         # todo: handle iso date strings
         # todo: handle bad date strings
         if start and end: # all values provided, handle endpoint
+            # end can be declared relative to start as a timedelta
             if isinstance(end, datetime):
                 pass
             elif isinstance(end, timedelta):
@@ -38,6 +39,14 @@ class SeaState:
         elif not start and not end: # nothing provided, return today
             start = datetime.today()
             end = datetime.today()
+            
+        # raise exception if end is before start
+        if end > start:
+            raise SeaStateException("end date is after start")
+        
+        # raise exception if end is in the future
+        if end > datetime.today():
+            raise SeaStateException("End date is in the future, SeaState object does not perform forecasting")
         
         # Get data
         data = {}
