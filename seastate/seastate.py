@@ -40,13 +40,15 @@ class SeaState:
             start = datetime.today()
             end = datetime.today()
             
-        # raise exception if end is before start
+        # remove microseconds to pass comparison tests
+        if isinstance(start,datetime):
+            start = start.replace(microsecond=0)
+        if isinstance(end,datetime):
+            end = end.replace(microsecond=0)
+            
+        # log warning if end is before start
         if end > start:
-            raise SeaStateException("end date is after start")
-        
-        # raise exception if end is in the future
-        if end > datetime.today():
-            raise SeaStateException("End date is in the future, SeaState object does not perform forecasting")
+            self._logger.warning("end is after start")
         
         # Get data
         data = {}
@@ -62,7 +64,11 @@ class SeaState:
 
 if __name__ == '__main__':
     test = SeaState(32,-117)
-    start = datetime(2022,7,5)
-    end = datetime(2022,7,5)
-    a = test.hourly(start,end)
+    # start = datetime(2022,7,5)
+    # end = datetime(2022,7,5)
+    # a = test.hourly(start,end)
+    
+    start = datetime(1996,7,5)
+    end = datetime(1996,7,5)
+    b = test.hourly(start,end)
     pass

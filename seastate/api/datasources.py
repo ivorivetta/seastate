@@ -1,5 +1,4 @@
 import logging
-from html.parser import HTMLParser
 from typing import List
 
 import defusedxml.minidom

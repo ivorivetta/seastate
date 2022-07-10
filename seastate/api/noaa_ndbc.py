@@ -39,19 +39,27 @@ class NdbcApi:
         # todo: choose key for each measurement
         measurement = measurement.lower()
         if 'tide' in measurement:
-            measurement_key = 'TIDE'
+            measurement_key = ['TIDE']
         elif 'wind' in measurement:
+            measurement_key = ['WSPD','SPD']
             #todo: handle 2d+ measurements
-            measurement_key = 'WSPD'
+            # for wind direction:
+            # measurement_key = ['WDIR', 'WD','DIR']
+            # For wind gust:
+            # measurement_key = ['GST', 'GSP']
         elif 'water_temp' in measurement:
-            measurement_key = 'WTMP'
+            measurement_key = ['WTMP']
         elif 'air_temp' in measurement:
-            measurement_key = 'ATMP'
+            measurement_key = ['ATMP']
         elif 'air_press' in measurement:
-            measurement_key = 'PRES'
+            measurement_key = ['PRES','BARO','BAR']
         elif 'wave' in measurement:
+            measurement_key = ['WVHT','H0']
             #todo handle swell information
-            measurement_key = 'WVHT'
+            # For dominant wave period
+            # measurement_key = ['DPD','DOMPD']
+            # For average wave period
+            # measurement_key = ['APD','AVP']
         elif 'conductivity' in measurement:
             raise SeaStateException("Unsupported measurement requested, please report issue")
         else:
@@ -91,11 +99,15 @@ class NdbcApi:
 
         result = ''
         for endpoint in endpoints:
-            res = self._rest_adapter.get(endpoint=endpoint)
-            if res.status_code == 200:
+            try:
+                res = self._rest_adapter.get(endpoint=endpoint)
+            except (SeaStateException) as e:
+                self._logger.warning(f"{str(e)} for {endpoint}")
+                continue
+            if 200 <= res.status_code <= 299:
                 result += res.data
             else:
-                self._logger.error(f"failed to retrieve endpoint {endpoint}")
+                self._logger.warning(f"{str(res.status_code)} for {endpoint}")
                 
                 
         
@@ -103,70 +115,79 @@ class NdbcApi:
         # realtime ndbc reports are a text file with previous 45 days of measurements
         # archival are a years worth
         # todo: unpack text file into t: and v:
-        try:
-            data = []
-            for i, value in enumerate(result.split('\n')):
-                # turn str to list
-                # known anomaly: 2 space characters sometimes delimiting 
-                line = value.replace('  ', ' ').split(' ')
-                while ' ' in line:
-                    line.remove(' ') #remove blanks
-                while '' in line:
-                    line.remove('') #remove blanks
-                
-                # handle corrupted lines
-                if len(line) == 0:
-                    self._logger.info(f"ignoring line #{i}:{str(line)}")
-                    continue
-                
-                # handle header lines
-                if line[0] in ['#YY', 'YY']:
-                    # column name starts with #YY in realtime, YY in archive
-                    header = line
-                    # strip '#' from '#YY'
-                    header[0] = header[0].strip('#')
-                    continue
-                elif line[0] in ['#yr']:
-                    # skipping units line
-                    continue
+        data = []
+        for i, value in enumerate(result.split('\n')):
+            # turn str to list
+            # known anomaly: 2 space characters sometimes delimiting 
+            line = value.replace('  ', ' ').split(' ')
+            while ' ' in line:
+                line.remove(' ') #remove blanks
+            while '' in line:
+                line.remove('') #remove blanks
+            
+            # handle corrupted lines
+            if len(line) == 0:
+                self._logger.info(f"ignoring line #{i}:{str(line)}")
+                continue
+            
+            # handle header lines
+            if line[0] in ['#YY', 'YY']:
+                # header row starts with #YY in realtime, YY in archive
+                header = line
+                # strip '#' from '#YY'
+                header[0] = header[0].strip('#')
+                continue
+            elif line[0] in ['#yr']:
+                # skipping units line
+                continue
 
-                
-                # skip lines outside of daterange
-                if not start.year <= int(line[0]) <= end.year:
-                    continue
-                if not start.month <= int(line[1]) <= end.month:
-                    continue
-                if not start.day <= int(line[2]) <= end.day:
-                    continue
-                
-                # line has been requested
-                # parse timestamp
-                timestamp = datetime(
-                    year=int(line[0]),
-                    month=int(line[1]),
-                    day=int(line[2]),
-                    hour=int(line[3]),
-                    minute=int(line[4])).isoformat()
-                
-                data.append({
-                    't': timestamp,
-                    'v': line[header.index(measurement_key)]
-                              })
-                
-                #todo: check for double entries between realtime and archive
-                
-        except (KeyError) as e:
-            self._logger.error(result.data)
-            raise SeaStateException("NdbcApi unpacking error") from e
+            
+            # skip lines outside of daterange
+            # archive files sometimes use 95 instead of 1995
+            if not (start.year <= int(line[0]) <= end.year) and not (abs(start.year % 100) <= int(line[0]) <= abs(end.year % 100)):
+                # 4 digit year representation
+                continue
+            if not start.month <= int(line[1]) <= end.month:
+                continue
+            if not start.day <= int(line[2]) <= end.day:
+                continue
+            
+            # line is in requested daterange
+            # parse timestamp
+            timestamp = datetime(
+                year=int(line[0] if len(line[0])==4 else '19' + line[0]), #rebuild dates with archive format
+                month=int(line[1]),
+                day=int(line[2]),
+                hour=int(line[3]),
+                minute=int(line[4] if 'mm' in header else 0) # archival format is hourly
+                ).isoformat(sep= ' ')
+            # parse measurement column
+            # because of changes in the source api column names over the years
+            # we try to unpack with the possible variants
+            temp_data = {}
+            for key in measurement_key:
+                try:
+                    temp_data['t'] = timestamp
+                    temp_data['v'] = line[header.index(key)]
+                except (KeyError, ValueError) as e:
+                    pass
+            # and check for success before appending
+            if len(temp_data) == 2:
+                data.append(temp_data)
+            else:
+                self._logger.error(value)
+                raise SeaStateException("NdbcApi unpacking error, please report issue")
+        
+        # log warning if no data recovered for daterange
+        if len(data) == 0:
+            self._logger.warning(f"No {measurement} data recovered for daterange: {str(start.date())} : {str(end.date())}")
 
         return data
 
     def hourly(self, measurement:str, station_id:str, start:datetime, end: datetime) -> List[Dict]:
         result = self.measurements_from_date_range(measurement, station_id, start, end)
         # todo: filter results hourly
-        if result.status_code == 200:
-            return result.data
-        pass
+        return result
         
 if __name__ == '__main__':
     api = NdbcApi()
@@ -177,10 +198,13 @@ if __name__ == '__main__':
     # result = api.hourly('wind',46224,datetime.today()-timedelta(days=2*365+30),datetime.today()-timedelta(days=1*365+30))
 
     # check daterange spanning archive and realtime, into prior year
-    result = api.hourly('wind',46224,datetime.today()-timedelta(days=365+30),datetime.today())
+    # result = api.hourly('wind',46224,datetime.today()-timedelta(days=365+30),datetime.today())
     
- 
-    
+    # check old archive with different headers
+    # check date format
+    result = api.hourly('air_press',42040,datetime(1996,2,1),datetime(1996,2,2))
+
+
     
     # check
     pass
