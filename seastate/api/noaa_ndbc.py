@@ -184,10 +184,6 @@ class NdbcApi:
 
         return data
 
-    def hourly(self, measurement:str, station_id:str, start:datetime, end: datetime) -> List[Dict]:
-        result = self.measurements_from_date_range(measurement, station_id, start, end)
-        # todo: filter results hourly
-        return result
         
 if __name__ == '__main__':
     api = NdbcApi()

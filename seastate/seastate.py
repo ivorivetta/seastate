@@ -24,7 +24,7 @@ class SeaState:
         self.wave = ApiMediator('wave', self.lat, self.lon, self.include, self.exclude)
         self.conductivity = ApiMediator('conductivity', self.lat, self.lon, self.include, self.exclude)
         
-    def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
+    def measurements_from_date_range(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
         # Process timeframe
         # todo: handle iso date strings
         # todo: handle bad date strings
@@ -55,13 +55,21 @@ class SeaState:
         #todo: have a class property that summarizes the active apis for this list
         for api_key in ['tide', 'wind', 'water_temp', 'air_temp', 'air_press', 'wave', 'conductivity']:
             # access the configured api to generate response with hourly method 
-            data[api_key] = self.__getattribute__(api_key).api.hourly(
+            data[api_key] = self.__getattribute__(api_key).api.measurements_from_date_range(
                 measurement = self.__getattribute__(api_key).measurement,
                 station_id = self.__getattribute__(api_key).station.id,
                 start = start,
                 end = end)
         return data
 
+    def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
+        data_all = self.measurements_from_date_range(start,end)
+        
+        data= {}
+        for key in data_all:
+            data[key] = [x for x in data_all[key] if datetime(x['t']).minute == 0]
+        return data
+    
 if __name__ == '__main__':
     test = SeaState(32,-117)
     # start = datetime(2022,7,5)
