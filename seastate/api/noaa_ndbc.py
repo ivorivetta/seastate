@@ -104,11 +104,7 @@ class NdbcApi:
             except (SeaStateException) as e:
                 self._logger.warning(f"{str(e)} for {endpoint}")
                 continue
-            if 200 <= res.status_code <= 299:
-                result += res.data
-            else:
-                self._logger.warning(f"{str(res.status_code)} for {endpoint}")
-                
+            result += res.data
                 
         
         # unpack text result
@@ -142,7 +138,7 @@ class NdbcApi:
                 continue
 
             
-            # skip lines outside of daterange
+            # ignore lines outside of daterange
             # archive files sometimes use 95 instead of 1995
             if not (start.year <= int(line[0]) <= end.year) and not (abs(start.year % 100) <= int(line[0]) <= abs(end.year % 100)):
                 # 4 digit year representation
@@ -182,6 +178,7 @@ class NdbcApi:
         if len(data) == 0:
             self._logger.warning(f"No {measurement} data recovered for daterange: {str(start.date())} : {str(end.date())}")
 
+        # scrup duplicates between cutoff month and realtime
         return data
 
         

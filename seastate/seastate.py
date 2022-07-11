@@ -2,9 +2,9 @@ import logging
 from datetime import datetime, timedelta
 from typing import Dict, Union
 
-from pandas import DataFrame
+# from pandas import DataFrame
 
-from seastate.exceptions import SeaStateException
+# from seastate.exceptions import SeaStateException
 from seastate.api.api_mediator import ApiMediator
 
 logging.basicConfig(level=logging.DEBUG)
@@ -41,10 +41,14 @@ class SeaState:
             end = datetime.today()
             
         # remove microseconds to pass comparison tests
+        # remove hours and minutes from start
+        # set hours and minutes to end of day for start
         if isinstance(start,datetime):
             start = start.replace(microsecond=0)
+            start = start.replace(hour=0, minute=0)
         if isinstance(end,datetime):
             end = end.replace(microsecond=0)
+            end = end.replace(hour=23, minute=0)
             
         # log warning if end is before start
         if end > start:
@@ -63,20 +67,48 @@ class SeaState:
         return data
 
     def hourly(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
+        """Convenience method to return 1 sample per hour for each api
+
+        Args:
+            start (datetime, optional): _description_. Defaults to None.
+            end (Union[datetime, timedelta], optional): _description_. Defaults to None.
+
+        Returns:
+            Dict: _description_
+        """
         data_all = self.measurements_from_date_range(start,end)
-        
         data= {}
         for key in data_all:
-            data[key] = [x for x in data_all[key] if datetime(x['t']).minute == 0]
+            # find the first minute within the hour
+            # the apis typically use the same minute 
+            first_minute = 0
+            while not datetime.fromisoformat(data_all[key][0]['t']).minute == first_minute:
+                first_minute += 1
+                # prevent endless loop 
+                if first_minute == 60:
+                    data[key] = []
+                    continue
+            # keep one reading per hour
+            data[key] = [x for x in data_all[key] if datetime.fromisoformat(x['t']).minute == first_minute]
         return data
     
 if __name__ == '__main__':
-    test = SeaState(32,-117)
+    api = SeaState(32,-117)
     # start = datetime(2022,7,5)
     # end = datetime(2022,7,5)
     # a = test.hourly(start,end)
     
-    start = datetime(1996,7,5)
-    end = datetime(1996,7,5)
-    b = test.hourly(start,end)
+    # check daterange within realtime
+    result = api.hourly(datetime.today()-timedelta(days=2),datetime.today())
+    
+    # check daterange for request only in prior years
+    # result = api.hourly(datetime.today()-timedelta(days=2*365+30),datetime.today()-timedelta(days=1*365+30))
+
+    # check daterange spanning archive and realtime, into prior year
+    # result = api.hourly(datetime.today()-timedelta(days=365+30),datetime.today())
+    
+    # check old archive with different headers
+    # check date format
+    # result = api.hourly('air_press',42040,datetime(1996,2,1),datetime(1996,2,2))
+
     pass

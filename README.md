@@ -1,17 +1,13 @@
-# seastate
+# Seastate
 
 ## Summary
-Facade of APIs for collecting sea state by location and timeframe
+Facade of multiple APIs to collect sea state by location and timeframe
 
-**Notable features**
-- Time offset feature allows building of time coherent datasets, defaut is local timezone of measurement
-- Closest active measurement station is selected by default, filters can be used to select certain agencies
-- request-cache implemented with appropriate timeouts for each datasource
-- Forecasting available for Tide
-- Available datasources: Tide, wind, water temp ...
+**Features**
+- Closest active station is selected for each measurement
+- Reaches into historical archives
+- Available measurements and sources: Tide, wind, water temp, air temp, air pressure, conductivity and swell information
 
-**Requested Features**
-- Automatically reach into historical archives for older datasets
 
 ## Installing
 `pip install seastate`
