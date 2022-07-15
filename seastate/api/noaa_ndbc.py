@@ -42,11 +42,7 @@ class NdbcApi:
             measurement_key = ['TIDE']
         elif 'wind' in measurement:
             measurement_key = ['WSPD','SPD']
-            #todo: handle 2d+ measurements
-            # for wind direction:
-            # measurement_key = ['WDIR', 'WD','DIR']
-            # For wind gust:
-            # measurement_key = ['GST', 'GSP']
+            # additional wind information handled when unpacking
         elif 'water_temp' in measurement:
             measurement_key = ['WTMP']
         elif 'air_temp' in measurement:
@@ -55,11 +51,7 @@ class NdbcApi:
             measurement_key = ['PRES','BARO','BAR']
         elif 'wave' in measurement:
             measurement_key = ['WVHT','H0']
-            #todo handle swell information
-            # For dominant wave period
-            # measurement_key = ['DPD','DOMPD']
-            # For average wave period
-            # measurement_key = ['APD','AVP']
+            # additional swell information handled when unpacking
         elif 'conductivity' in measurement:
             raise SeaStateException("Unsupported measurement requested, please report issue")
         else:
@@ -160,25 +152,67 @@ class NdbcApi:
             # parse measurement column
             # because of changes in the source api column names over the years
             # we try to unpack with the possible variants
+            # details here: https://www.ndbc.noaa.gov/measdes.shtml
             temp_data = {}
+            # unpack time and main value
             for key in measurement_key:
                 try:
                     temp_data['t'] = timestamp
                     temp_data['v'] = line[header.index(key)]
                 except (KeyError, ValueError) as e:
                     pass
-            # and check for success before appending
-            if len(temp_data) == 2:
-                data.append(temp_data)
+            # check for success before continuing
+            if len(temp_data) >= 2:
+                pass
             else:
                 self._logger.error(value)
                 raise SeaStateException("NdbcApi unpacking error, please report issue")
-        
+            # wind sometimes has direction and gust data
+            if 'wind' in measurement:
+                # for wind direction:
+                for key in ['WDIR', 'WD','DIR']:
+                    try:
+                        temp = line[header.index(key)]
+                        temp_data['d'] = temp if temp and '999' not in temp else None # 999 for direction
+                    except Exception as e:
+                        self._logger.debug(f"{e} for {key} on {line}")
+                # For wind gust:
+                for key in ['GST', 'GSP']:
+                    try:
+                        temp = line[header.index(key)]
+                        temp_data['g'] = temp if temp and '99' not in temp else None # 99 for decimal
+                    except Exception:
+                        self._logger.debug(f"{e} for {key} on {line}")
+            # wave sometimes has period and direction
+            if 'wave' in measurement:
+                # for dominant wave period:
+                for key in ['DPD','DOMPD']:
+                    try:
+                        temp = line[header.index(key)]
+                        temp_data['dpd'] = temp if temp and '99' not in temp else None  # 99 for decimal
+                    except Exception as e:
+                        self._logger.debug(f"{e} for {key} on {line}")
+                # For dominant wave direction:
+                for key in ['MWD']:
+                    try:
+                        temp = line[header.index(key)]
+                        temp_data['mwd'] = temp if temp and '999' not in temp else None # 999 for direction
+                    except Exception:
+                        self._logger.debug(f"{e} for {key} on {line}")
+                # For average wave period
+                for key in ['APD','AVP']:
+                    try:
+                        temp = line[header.index(key)]
+                        temp_data['apd'] = temp if temp and '99' not in temp else None
+                    except Exception:
+                        self._logger.debug(f"{e} for {key} on {line}")
+            data.append(temp_data)
+            
         # log warning if no data recovered for daterange
         if len(data) == 0:
             self._logger.warning(f"No {measurement} data recovered for daterange: {str(start.date())} : {str(end.date())}")
 
-        # scrup duplicates between cutoff month and realtime
+        # todo: scrub duplicates between cutoff month and realtime
         return data
 
         
