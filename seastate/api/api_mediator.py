@@ -7,31 +7,17 @@ from seastate.exceptions import SeaStateException
 from seastate.models import Result, Station
 from seastate.utils import haversine
 
-logging.basicConfig(level=logging.DEBUG)
-
-
-    # mediator behavior
-        ## todo filters
-        # if include and exclude is blank, default is closest and active for __name__
-        # if 'inactive' in include, poll inactive stations as well?
-        # if include is not empty, only include modules specified
-        # if include is not empty, only include data sources specified
-        # if exclude is not empty, exclude data sources and modules specified
-        # if a specific stationID is specified, exclude that
-
-
 class ApiMediator:
-    def __init__(self, measurement: str, lat: float, lon: float, include: list=[], exclude: list=[], ssl_verify: bool = True, logger: logging.Logger = None):
-        """Constructor for configured api endpoint based on measurement type, gps coordinates and include/exclude filters 
+    def __init__(self, measurement: str, lat: float, lon: float, exclude: list=[], ssl_verify: bool = True, logger: logging.Logger = None):
+        """Constructor for configured api endpoint based on measurement type, gps coordinates and exclude filters 
         """
         self._ssl_verify = ssl_verify
         self._logger = logger or logging.getLogger(__name__)
         self._target_lat = lat
         self._target_lon = lon
-        self.include = include
         self.exclude = exclude
         self.measurement = measurement
-        self.station = self.nearest_station()
+        self.station = self.nearest_station() # nearest_station handles the selection logic
         self.api = self.station.api
         self.distance = haversine(self._target_lat,self._target_lon, self.station.lat, self.station.lon)
         
@@ -43,7 +29,7 @@ class ApiMediator:
     @_target_lat.setter
     def _target_lat(self,value):
         #  Latitudes are in range of -90 to 90
-        if -90 < value < 90:
+        if -90 <= value <= 90:
             self.__target_lat = value
         else:
             raise SeaStateException("Latitude must be between -90 and 90 degrees")
@@ -55,13 +41,14 @@ class ApiMediator:
     @_target_lon.setter
     def _target_lon(self,value):
         #  Longitudes are in range of -180 to 180
-        if -180 < value < 180:
+        if -180 <= value <= 180:
             self.__target_lon = value
         else:
             raise SeaStateException("Longitude must be between -180 and 180 degrees")
 
     # # Methods
     def nearest_station(self) -> Station:
+        # if measurement
         # Return dict of stations
         # n<2000 so just return them all
         try:
@@ -71,17 +58,19 @@ class ApiMediator:
             raise SeaStateException("Error retrieving stations") from e
 
         # Find station closest to input coordinates using haversine
-        # and is also active for specified measurement
-        # todo: implement include/exclude filtering
+        # and is active for specified measurement
         min = float('inf') # Initialize minimum pointer
         for eval_station in stations:
+            # skip if station is in exclude list
+            if eval_station.id in self.exclude:
+                continue
             # skip if eval_station is inactive
             if not eval_station.isActive:
                 continue
             # skip if station does not support measurement
             if not eval_station.isSupported(self.measurement):
                 continue
-            # compute distance between SeaState coords and current station
+            # compute distance between SeaState target coords and current station
             new_val = haversine(self._target_lat, self._target_lon, eval_station.lat, eval_station.lon)
             # if closer, update new minimum
             if new_val < min:

@@ -105,7 +105,7 @@ class DataSources:
                 temp_station['api'] = TidesAndCurrentsApi()
             except (IndexError) as e:
                 # Faulty station, skip station node
-                # todo: refactor into object to properly log parsing errors
+                self._logger.warn(e + str(line))
                 continue
             
             # separate loop to parse individual measurements

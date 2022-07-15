@@ -10,19 +10,18 @@ from seastate.api.api_mediator import ApiMediator
 logging.basicConfig(level=logging.DEBUG)
 
 class SeaState:
-    def __init__(self, lat: float, lon: float, include: list=[], exclude: list=[], logger: logging.Logger = None):
+    def __init__(self, lat: float, lon: float, exclude: list=[], logger: logging.Logger = None):
         self._logger = logger or logging.getLogger(__name__)
         self.lat = float(lat)
         self.lon = float(lon)
-        self.include = list(include)
         self.exclude = list(exclude)
-        self.tide = ApiMediator('tide', self.lat, self.lon, self.include, self.exclude)
-        self.wind = ApiMediator('wind', self.lat, self.lon, self.include, self.exclude)
-        self.water_temp = ApiMediator('water_temp', self.lat, self.lon, self.include, self.exclude)
-        self.air_temp = ApiMediator('air_temp', self.lat, self.lon, self.include, self.exclude)
-        self.air_press = ApiMediator('air_press', self.lat, self.lon, self.include, self.exclude)
-        self.wave = ApiMediator('wave', self.lat, self.lon, self.include, self.exclude)
-        self.conductivity = ApiMediator('conductivity', self.lat, self.lon, self.include, self.exclude)
+        self.tide = ApiMediator('tide', self.lat, self.lon, self.exclude)
+        self.wind = ApiMediator('wind', self.lat, self.lon, self.exclude)
+        self.water_temp = ApiMediator('water_temp', self.lat, self.lon, self.exclude)
+        self.air_temp = ApiMediator('air_temp', self.lat, self.lon, self.exclude)
+        self.air_press = ApiMediator('air_press', self.lat, self.lon, self.exclude)
+        self.wave = ApiMediator('wave', self.lat, self.lon, self.exclude)
+        self.conductivity = ApiMediator('conductivity', self.lat, self.lon, self.exclude)
         
     def measurements_from_date_range(self, start: datetime = None, end: Union[datetime, timedelta] = None) -> Dict:
         # Process timeframe

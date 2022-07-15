@@ -5,9 +5,9 @@ Facade of multiple APIs to collect sea state by location and timeframe
 
 **Features**
 - Closest active station is selected for each measurement
-- Reaches into historical archives
-- Available measurements and sources: Tide, wind, water temp, air temp, air pressure, conductivity and swell information
-
+- Reaches into secondary historical archives when required
+- Available measurements: Tide, wind, water temp, air temp, air pressure, conductivity and swell information
+- Returns pandas dataframe compatible lists
 
 ## Installing
 `pip install seastate`
@@ -20,7 +20,7 @@ sample code with start end
 sample code with timedelta
 ```
 
-### Retrieving a dataframe
+### Converting to a dataframe
 ```
 sample code
 ```
