@@ -2,9 +2,6 @@ import logging
 from datetime import datetime, timedelta
 from typing import Dict, Union
 
-# from pandas import DataFrame
-
-# from seastate.exceptions import SeaStateException
 from seastate.api.api_mediator import ApiMediator
 
 logging.basicConfig(level=logging.DEBUG)
@@ -81,12 +78,12 @@ class SeaState:
             # find the first minute within the hour
             # the apis typically use the same minute 
             first_minute = 0
-            while not datetime.fromisoformat(data_all[key][0]['t']).minute == first_minute:
+            while datetime.fromisoformat(data_all[key][0]['t']).minute != first_minute:
                 first_minute += 1
                 # prevent endless loop 
                 if first_minute == 60:
                     data[key] = []
-                    continue
+                    break
             # keep one reading per hour
             data[key] = [x for x in data_all[key] if datetime.fromisoformat(x['t']).minute == first_minute]
         return data

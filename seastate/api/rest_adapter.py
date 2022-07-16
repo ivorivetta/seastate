@@ -1,7 +1,6 @@
 import logging
 from json import JSONDecodeError
-from typing import Dict, List
-from numpy import full
+from typing import Dict
 
 import requests
 import requests.packages
@@ -79,7 +78,7 @@ class RestAdapter:
             else:
                 # handle a restful endpoint
                 data_out = response.json()
-        except (ValueError, JSONDecodeError) as e:
+        except (ValueError) as e:
             self._logger.error(msg=log_line_post.format(False, None, e))
             raise SeaStateException("Bad JSON in Response") from e
         is_success = 299 >= response.status_code >= 200

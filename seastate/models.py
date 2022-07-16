@@ -23,7 +23,7 @@ class Result:
     """
     status_code: int
     message: str = ''
-    data: List[Dict] = None
+    data: List[Dict] = []
     
     def __post__init__(self, data):
         self.data = data if data else [] #init data if dne
@@ -36,8 +36,6 @@ class Station:
     api: Any
     tide: bool = False
     wind: bool = False
-    # wind_dir: bool = False  #todo: increase granularity of station datamodel
-    # wind_gust: bool = False
     water_temp: bool = False
     air_temp: bool = False
     air_press: bool = False

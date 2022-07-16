@@ -2,9 +2,9 @@ import logging
 from typing import List
 
 import defusedxml.minidom
-from seastate.api.rest_adapter import RestAdapter
 from seastate.api.noaa_ndbc import NdbcApi
 from seastate.api.noaa_tidesandcurrents import TidesAndCurrentsApi
+from seastate.api.rest_adapter import RestAdapter
 from seastate.exceptions import SeaStateException
 from seastate.models import Station
 
@@ -36,10 +36,8 @@ class DataSources:
         stations = []
         for i, value in enumerate(result.data.split('\n')):
             # skipping 2 header lines
-            if i == 0:
-                continue #skip header
-            elif i == 1:
-                continue #skip units
+            if i == 0 or i == 1:
+                continue #skip header and unit lines
             
             # split current line by delimiter and clear empty values
             line = value.split(' ')    
@@ -62,8 +60,6 @@ class DataSources:
                 'api': NdbcApi(),
                 'tide': True if line[21] != 'MM' else False,
                 'wind': True if line[8] != 'MM' else False,
-                # wind_dir= True if line[9] != 'MM' else False,
-                # wind_gust= True if line[10] != 'MM' else False,
                 'water_temp': True if line[18] != 'MM' else False,
                 'air_temp': True if line[17] != 'MM' else False,
                 'air_press': True if line[15] != 'MM' else False,
@@ -125,8 +121,6 @@ class DataSources:
                     temp_station['air_press'] = True
                 elif 'Conductivity' in name and status:
                     temp_station['conductivity'] = True
-                else:
-                    pass          
 
             # construct station with temp var
             stations.append(Station(**temp_station))
@@ -138,8 +132,4 @@ class DataSources:
 
 if __name__ == '__main__':
     tnc = DataSources().tides_and_currents_stations()
-    ndbc = DataSources().ndbc_stations()
-    pass
-    # import pdb
-    # pdb.set_trace()
-    
+    ndbc = DataSources().ndbc_stations()    

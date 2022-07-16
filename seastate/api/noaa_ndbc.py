@@ -17,7 +17,7 @@ class NdbcApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter('www.ndbc.noaa.gov', api_key, ssl_verify, logger)
         
-    def _parse_text(self, text:str, start:datetime, end: datetime) -> List[Dict]:
+    def _parse_timestamp(self, text:str) -> List[Dict]:
         pass
         
         
@@ -175,14 +175,14 @@ class NdbcApi:
                         temp = line[header.index(key)]
                         temp_data['d'] = temp if temp and '999' not in temp and 'MM' not in temp else None # 999 for direction
                     except Exception as e:
-                        self._logger.debug(f"{e} for {key} on {line}")
+                        self._logger.debug(f"{e} for {measurement}")
                 # For wind gust:
                 for key in ['GST', 'GSP']:
                     try:
                         temp = line[header.index(key)]
                         temp_data['g'] = temp if temp and '99' not in temp and 'MM' not in temp else None # 99 for decimal
                     except Exception as e:
-                        self._logger.debug(f"{e} for {key} on {line}")
+                        self._logger.debug(f"{e} for {measurement}")
             # wave sometimes has period and direction
             if 'wave' in measurement:
                 # for dominant wave period:
@@ -191,21 +191,21 @@ class NdbcApi:
                         temp = line[header.index(key)]
                         temp_data['dpd'] = temp if temp and '99' not in temp and 'MM' not in temp else None  # 99 for decimal
                     except Exception as e:
-                        self._logger.debug(f"{e} for {key} on {line}")
+                        self._logger.debug(f"{e} for {measurement}")
                 # For dominant wave direction:
                 for key in ['MWD']:
                     try:
                         temp = line[header.index(key)]
                         temp_data['mwd'] = temp if temp and '999' not in temp and 'MM' not in temp else None # 999 for direction
                     except Exception as e:
-                        self._logger.debug(f"{e} for {key} on {line}")
+                        self._logger.debug(f"{e} for {measurement}")
                 # For average wave period
                 for key in ['APD','AVP']:
                     try:
                         temp = line[header.index(key)]
                         temp_data['apd'] = temp if temp and '99' not in temp and 'MM' not in temp else None
                     except Exception as e:
-                        self._logger.debug(f"{e} for {key} on {line}")
+                        self._logger.debug(f"{e} for {measurement}")
             data.append(temp_data)
             
         # log warning if no data recovered for daterange
@@ -230,10 +230,3 @@ if __name__ == '__main__':
     # check old archive with different headers
     # check date format
     result = api.hourly('air_press',42040,datetime(1996,2,1),datetime(1996,2,2))
-
-
-    
-    # check
-    pass
-    # import pdb
-    # pdb.set_trace()

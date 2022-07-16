@@ -1,14 +1,12 @@
 import logging
-from datetime import datetime
-from typing import Any, Tuple
 
 from seastate.api.datasources import DataSources
 from seastate.exceptions import SeaStateException
-from seastate.models import Result, Station
+from seastate.models import Station
 from seastate.utils import haversine
 
 class ApiMediator:
-    def __init__(self, measurement: str, lat: float, lon: float, exclude: list=[], ssl_verify: bool = True, logger: logging.Logger = None):
+    def __init__(self, measurement: str, lat: float, lon: float, exclude: list = None, ssl_verify: bool = True, logger: logging.Logger = None):
         """Constructor for configured api endpoint based on measurement type, gps coordinates and exclude filters 
         """
         self._ssl_verify = ssl_verify
@@ -59,7 +57,7 @@ class ApiMediator:
 
         # Find station closest to input coordinates using haversine
         # and is active for specified measurement
-        min = float('inf') # Initialize minimum pointer
+        min_ptr = float('inf') # Initialize minimum pointer
         for eval_station in stations:
             # skip if station is in exclude list
             if eval_station.id in self.exclude:
@@ -73,8 +71,8 @@ class ApiMediator:
             # compute distance between SeaState target coords and current station
             new_val = haversine(self._target_lat, self._target_lon, eval_station.lat, eval_station.lon)
             # if closer, update new minimum
-            if new_val < min:
-                min = new_val
+            if new_val < min_ptr:
+                min_ptr = new_val
                 station = eval_station
         return station
 
@@ -89,5 +87,4 @@ if __name__ == '__main__':
     
     # testing wind
     api = ApiMediator('Wind',32,-117) # testing San Diego for tide
-    
-    pass
+
