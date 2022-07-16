@@ -173,15 +173,15 @@ class NdbcApi:
                 for key in ['WDIR', 'WD','DIR']:
                     try:
                         temp = line[header.index(key)]
-                        temp_data['d'] = temp if temp and '999' not in temp else None # 999 for direction
+                        temp_data['d'] = temp if temp and '999' not in temp and 'MM' not in temp else None # 999 for direction
                     except Exception as e:
                         self._logger.debug(f"{e} for {key} on {line}")
                 # For wind gust:
                 for key in ['GST', 'GSP']:
                     try:
                         temp = line[header.index(key)]
-                        temp_data['g'] = temp if temp and '99' not in temp else None # 99 for decimal
-                    except Exception:
+                        temp_data['g'] = temp if temp and '99' not in temp and 'MM' not in temp else None # 99 for decimal
+                    except Exception as e:
                         self._logger.debug(f"{e} for {key} on {line}")
             # wave sometimes has period and direction
             if 'wave' in measurement:
@@ -189,22 +189,22 @@ class NdbcApi:
                 for key in ['DPD','DOMPD']:
                     try:
                         temp = line[header.index(key)]
-                        temp_data['dpd'] = temp if temp and '99' not in temp else None  # 99 for decimal
+                        temp_data['dpd'] = temp if temp and '99' not in temp and 'MM' not in temp else None  # 99 for decimal
                     except Exception as e:
                         self._logger.debug(f"{e} for {key} on {line}")
                 # For dominant wave direction:
                 for key in ['MWD']:
                     try:
                         temp = line[header.index(key)]
-                        temp_data['mwd'] = temp if temp and '999' not in temp else None # 999 for direction
-                    except Exception:
+                        temp_data['mwd'] = temp if temp and '999' not in temp and 'MM' not in temp else None # 999 for direction
+                    except Exception as e:
                         self._logger.debug(f"{e} for {key} on {line}")
                 # For average wave period
                 for key in ['APD','AVP']:
                     try:
                         temp = line[header.index(key)]
-                        temp_data['apd'] = temp if temp and '99' not in temp else None
-                    except Exception:
+                        temp_data['apd'] = temp if temp and '99' not in temp and 'MM' not in temp else None
+                    except Exception as e:
                         self._logger.debug(f"{e} for {key} on {line}")
             data.append(temp_data)
             
