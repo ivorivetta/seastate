@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "seastate"
+version = "0.0.1"
+authors = [
+  { name="Ivo Rivetta", email="ivo@nadeval.com" },
+]
+description = "Sea State from coordinates and timeframe"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ivorivetta/seastate"
+"Bug Tracker" = "https://github.com/ivorivetta/seastate/issues"

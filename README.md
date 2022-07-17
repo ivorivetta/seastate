@@ -16,7 +16,7 @@ Collect sea state by location and timeframe
 ## Examples
 ### Retrieving raw data
 ```
-from seastate import SeaState
+from seastate.seastate import SeaState
 from datetime import datetime, timedelta
 
 # make SeaState object for specific location
@@ -32,10 +32,3 @@ end = datetime.today()
 san_diego_past_30 = san_diego.measurements_from_date_range(start,end)
 
 ```
-
-## For developers:
-### Testing
-`py test`
-
-### Generating UMLs
-`pyreverse -d UML -o png seastate`
