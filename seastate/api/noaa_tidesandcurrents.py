@@ -100,9 +100,5 @@ if __name__ == '__main__':
     api = TidesAndCurrentsApi()
     result = api.hourly('wind',9410230, datetime.today(),datetime.today())
     print(result)
-    # result = api.hourly(9410230, datetime.today(),datetime.today(),'air_temp')
-    # print(result)
-    # result = api.hourly(9410230, datetime.today(),datetime.today(),'water_temp')
-    # print(result)
-    # import pdb
-    # pdb.set_trace()
+    result = api.hourly(9410230, datetime.today(),datetime.today(),'air_temp')
+    result = api.hourly(9410230, datetime.today(),datetime.today(),'water_temp')

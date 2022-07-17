@@ -49,7 +49,6 @@ class RestAdapter:
         full_url = self.url + endpoint
         headers = {'x-api-key': self._api_key}
         log_line_pre = f"method={http_method}, url={full_url}, params={ep_params}"
-        # log_line_post = ', '.join((log_line_pre, "success={}, status_code={}, message={}")) # nested f-string doesn't work
         log_line_post = "result: success={}, status_code={}, message={}"
         # Log HTTP params and try HTTP request
         try:

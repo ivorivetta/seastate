@@ -41,13 +41,13 @@ class Station:
     air_press: bool = False
     wave: bool = False
     conductivity: bool = False
-    isActive: bool = False
+    is_active: bool = False
     name: str = ''
     
     def __post_init__(self):
-        # toggle if self.isActive
+        # toggle if self.is_active
         if len(self.supported_measurements()) > 0:
-            self.isActive = True
+            self.is_active = True
             
     def supported_measurements(self) -> List[str]:
         """Return list of supported measurements for station
@@ -62,7 +62,7 @@ class Station:
                 supported.append(key)
         return supported
         
-    def isSupported(self, value:str) -> bool:
+    def is_supported(self, value:str) -> bool:
         # Implemented this to always run comparison on lower case casting of strings
         for x in self.supported_measurements():
             if value in x:

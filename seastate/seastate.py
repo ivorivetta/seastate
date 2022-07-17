@@ -26,9 +26,7 @@ class SeaState:
         # todo: handle bad date strings
         if start and end: # all values provided, handle endpoint
             # end can be declared relative to start as a timedelta
-            if isinstance(end, datetime):
-                pass
-            elif isinstance(end, timedelta):
+            if isinstance(end, timedelta):
                 end = start + end
         elif start and not end: # no end provided, return same day as start
             end = start
@@ -90,21 +88,20 @@ class SeaState:
     
 if __name__ == '__main__':
     api = SeaState(32,-117)
-    # start = datetime(2022,7,5)
-    # end = datetime(2022,7,5)
-    # a = test.hourly(start,end)
+    start = datetime(2022,7,5)
+    end = datetime(2022,7,5)
+    a = api.hourly(start,end)
     
     # check daterange within realtime
     result = api.hourly(datetime.today()-timedelta(days=2),datetime.today())
     
     # check daterange for request only in prior years
-    # result = api.hourly(datetime.today()-timedelta(days=2*365+30),datetime.today()-timedelta(days=1*365+30))
+    result = api.hourly(datetime.today()-timedelta(days=2*365+30),datetime.today()-timedelta(days=1*365+30))
 
     # check daterange spanning archive and realtime, into prior year
-    # result = api.hourly(datetime.today()-timedelta(days=365+30),datetime.today())
+    result = api.hourly(datetime.today()-timedelta(days=365+30),datetime.today())
     
     # check old archive with different headers
     # check date format
-    # result = api.hourly('air_press',42040,datetime(1996,2,1),datetime(1996,2,2))
+    result = api.hourly('air_press',42040,datetime(1996,2,1),datetime(1996,2,2))
 
-    pass

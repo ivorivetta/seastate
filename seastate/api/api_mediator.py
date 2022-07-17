@@ -64,10 +64,10 @@ class ApiMediator:
             if eval_station.id in self.exclude:
                 continue
             # skip if eval_station is inactive
-            if not eval_station.isActive:
+            if not eval_station.is_active:
                 continue
             # skip if station does not support measurement
-            if not eval_station.isSupported(self.measurement):
+            if not eval_station.is_supported(self.measurement):
                 continue
             # compute distance between SeaState target coords and current station
             new_val = haversine(self._target_lat, self._target_lon, eval_station.lat, eval_station.lon)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     api = ApiMediator('Tide',32,-117) # testing San Diego for tide
     # Station should have tide as a valid measurement
     assert api.station.tide
-    assert api.station.isSupported(api.measurement)
+    assert api.station.is_supported(api.measurement)
     # out of bound lat/lon should throw errors
     
     # testing wind

@@ -29,6 +29,7 @@ class DataSources:
         Returns:
             List[Station]: _description_
         """
+        # todo: refactor this spaghetti code
         # check station status by retrieving latest measurements from all stations
         result = RestAdapter('www.ndbc.noaa.gov/').get('data/latest_obs/latest_obs.txt')
         
@@ -81,6 +82,7 @@ class DataSources:
         Returns:
             List[Station]: _description_
         """
+        # todo: refactor this spaghetti code
         # TidesAndCurrent station capabilities are kept here
         result = RestAdapter('opendap.co-ops.nos.noaa.gov/').get('stations/stationsXML.jsp')
         

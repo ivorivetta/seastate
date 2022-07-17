@@ -17,10 +17,6 @@ class NdbcApi:
         self._logger = logger or logging.getLogger(__name__)
         self._rest_adapter = RestAdapter('www.ndbc.noaa.gov', api_key, ssl_verify, logger)
         
-    def _parse_timestamp(self, text:str) -> List[Dict]:
-        pass
-        
-        
     def measurements_from_date_range(self, measurement:str, station_id:str, start:datetime, end: datetime) -> List[Dict]:
         """Returns Result for stationID and datetime start and end
 
@@ -35,8 +31,7 @@ class NdbcApi:
         Returns:
             Result: _description_
         """
-        
-        # todo: choose key for each measurement
+        # todo refactor this spaghetti code
         measurement = measurement.lower()
         if 'tide' in measurement:
             measurement_key = ['TIDE']
@@ -162,9 +157,7 @@ class NdbcApi:
                 except (KeyError, ValueError) as e:
                     pass
             # check for success before continuing
-            if len(temp_data) >= 2:
-                pass
-            else:
+            if len(temp_data) < 2:
                 self._logger.error(value)
                 raise SeaStateException("NdbcApi unpacking error, please report issue")
             # wind sometimes has direction and gust data
