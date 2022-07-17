@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Dict, Any
 
 # the implemented measurements for 
@@ -23,7 +23,7 @@ class Result:
     """
     status_code: int
     message: str = ''
-    data: List[Dict] = []
+    data: List[Dict] = field(default_factory=list)
     
     def __post__init__(self, data):
         self.data = data if data else [] #init data if dne

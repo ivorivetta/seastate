@@ -1,3 +1,4 @@
+from dataclasses import field
 import logging
 
 from seastate.api.datasources import DataSources
@@ -6,7 +7,7 @@ from seastate.models import Station
 from seastate.utils import haversine
 
 class ApiMediator:
-    def __init__(self, measurement: str, lat: float, lon: float, exclude: list = None, ssl_verify: bool = True, logger: logging.Logger = None):
+    def __init__(self, measurement: str, lat: float, lon: float, exclude: list = field(default_factory=list), ssl_verify: bool = True, logger: logging.Logger = None):
         """Constructor for configured api endpoint based on measurement type, gps coordinates and exclude filters 
         """
         self._ssl_verify = ssl_verify
