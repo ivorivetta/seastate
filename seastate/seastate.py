@@ -43,7 +43,7 @@ class SeaState:
             end = end.replace(hour=23, minute=0)
             
         # log warning if end is before start
-        if end > start:
+        if end < start:
             self._logger.warning("end is after start")
         
         # Get data
@@ -91,15 +91,15 @@ if __name__ == '__main__':
     a = api.hourly(start,end)
     
     # check daterange within realtime
-    result = api.hourly(datetime.today()-timedelta(days=2),datetime.today())
+    # result = api.hourly(datetime.today()-timedelta(days=2),datetime.today())
     
-    # check daterange for request only in prior years
-    result = api.hourly(datetime.today()-timedelta(days=2*365+30),datetime.today()-timedelta(days=1*365+30))
+    # # check daterange for request only in prior years
+    # result = api.hourly(datetime.today()-timedelta(days=2*365+30),datetime.today()-timedelta(days=1*365+30))
 
-    # check daterange spanning archive and realtime, into prior year
-    result = api.hourly(datetime.today()-timedelta(days=365+30),datetime.today())
+    # # check daterange spanning archive and realtime, into prior year
+    # result = api.hourly(datetime.today()-timedelta(days=365+30),datetime.today())
     
-    # check old archive with different headers
-    # check date format
-    result = api.hourly('air_press',42040,datetime(1996,2,1),datetime(1996,2,2))
+    # # check old archive with different headers
+    # # check date format
+    # result = api.hourly('air_press',42040,datetime(1996,2,1),datetime(1996,2,2))
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "seastate"
-version = "0.1.0"
+version = "0.1.1"
 description = "Collect seastate data based on location and timeframe"
 authors = ["Ivo <ivorivetta@users.noreply.github.com>"]
 license = "MIT"
