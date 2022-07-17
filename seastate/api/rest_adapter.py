@@ -7,8 +7,6 @@ import requests.packages
 from seastate.exceptions import SeaStateException
 from seastate.models import Result
 
-logging.basicConfig(level=logging.DEBUG)
-
 class RestAdapter:
     def __init__(self, hostname: str, api_key: str = '', ssl_verify: bool = True, logger: logging.Logger = None):
         """Constructor for RestAdapter, supports GET

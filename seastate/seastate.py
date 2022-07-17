@@ -4,8 +4,6 @@ from typing import Dict, Union
 
 from seastate.api.api_mediator import ApiMediator
 
-logging.basicConfig(level=logging.DEBUG)
-
 class SeaState:
     def __init__(self, lat: float, lon: float, exclude: list=[], logger: logging.Logger = None):
         self._logger = logger or logging.getLogger(__name__)
