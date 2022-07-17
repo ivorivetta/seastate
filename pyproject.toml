@@ -1,23 +1,25 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[project]
+[tool.poetry]
 name = "seastate"
-version = "0.0.1"
-authors = [
-  { name="Ivo Rivetta", email="ivo@nadeval.com" },
-]
-description = "Sea State from coordinates and timeframe"
+version = "0.1.0"
+description = "Collect seastate data based on location and timeframe"
+authors = ["Ivo <ivorivetta@users.noreply.github.com>"]
+license = "MIT"
 readme = "README.md"
-license = { file="LICENSE" }
-requires-python = ">=3.7"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
+repository = "https://github.com/ivorivetta/seastate"
 
-[project.urls]
-"Homepage" = "https://github.com/ivorivetta/seastate"
+[tool.poetry.dependencies]
+python = ">=3.8,<4"
+defusedxml = "^0.7.1"
+numpy = "^1.23.1"
+requests = "^2.28.1"
+urllib3 = "^1.26.10"
+
+[tool.poetry.dev-dependencies]
+pandas = "^1.4.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.urls]
 "Bug Tracker" = "https://github.com/ivorivetta/seastate/issues"

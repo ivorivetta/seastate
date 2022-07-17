@@ -1,7 +1,7 @@
 # Seastate
 
 ## Summary
-Collect sea state by location and timeframe
+Collect sea state data based on location and timeframe
 
 **Features**
 - Closest active station is selected for each measurement
