@@ -1,7 +1,7 @@
 # Seastate
 
 ## Summary
-Collect sea state data based on location and timeframe
+Collect ocean measurement data based on location and timeframe
 
 **Features**
 - Closest active station is selected for each measurement
@@ -34,6 +34,16 @@ san_diego_today['conductivity']-> [{t: time, v: value}]
 ```
 Measurement details for NDBC are [here](https://www.ndbc.noaa.gov/measdes.shtml) and for Tides and Currents [here](https://api.tidesandcurrents.noaa.gov/api/prod/responseHelp.html)
 
+## Measurement x API breakdown
+| Measurement | T&C | NDBC |
+| ---: | :---: | :---: |
+|tide | y | y |
+|wind | y | y |
+|water_temp | y | y |
+|air_temp | y | y |
+|air_press | y | y |
+|wave |  | y |
+|conductivity | y |  |
 
 ## More Examples
 ### Measurements for past 30 days
@@ -48,5 +58,6 @@ san_diego_past_30 = san_diego.measurements_from_date_range(start,end)
 ### Hourly Slices
 ```
 san_diego_past_30_hourly = san_diego.hourly(start,end) # this returns a single reading per hour
-# experimental feature, no guarantee between APIs that minute readings will align or exist in all cases
+# experimental feature
+# no guarantee between APIs that readings will align or exist in all cases
 ```
