@@ -1,5 +1,5 @@
 # Seastate
-** Feel free to mention and feature requests, additional APIs and unexpected behaviors in the issues tab
+** Sorry! This is currently broken
 ## Summary
 Collect ocean measurement data based on location and timeframe
 
