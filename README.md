@@ -19,7 +19,7 @@ Collect ocean measurement data based on location and timeframe
 ## Quick start
 
 ```
-from seastate.seastate import SeaState
+from seastate import SeaState
 from datetime import datetime
 
 # make SeaState object for specific location
@@ -97,7 +97,7 @@ san_diego.tide.station.lon
 ### Measurements for past 30 days
 
 ```
-from seastate.seastate import SeaState
+from seastate import SeaState
 from datetime import datetime, timedelta
 
 start = datetime.today()-timedelta(days=30)

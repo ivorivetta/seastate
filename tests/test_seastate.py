@@ -1,4 +1,4 @@
-from seastate.seastate import SeaState
+from seastate import SeaState
 from datetime import datetime, timedelta
 import pytest
 from seastate.settings import MEASUREMENTS

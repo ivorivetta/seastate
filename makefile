@@ -1,6 +1,6 @@
 # Variables
 PACKAGE_NAME := seastate
-VERSION := 0.2.0beta00
+VERSION := 0.2.0b1
 
 # Targets
 .PHONY: install venv test build clean publish
