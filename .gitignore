@@ -1,8 +1,11 @@
-.DS_Store
-
 #
 UML/
 .vscode/
+.DS_Store
+*_cache
+todo.*
+*.old
+venv_test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

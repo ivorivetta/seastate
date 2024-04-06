@@ -6,27 +6,36 @@
     "configurations": [
         {
             "name": "Python: api submodule",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "seastate.api.${fileBasenameNoExtension}",
             "console": "integratedTerminal",
             "justMyCode": true
         },
         {
-            "name": "Python: module debug",
-            "type": "python",
+            "name": "seastate main",
+            "type": "debugpy",
             "request": "launch",
-            "module": "seastate.${fileBasenameNoExtension}",
+            // "module": "seastate.${fileBasenameNoExtension}",
+            "module": "seastate.seastate",
             "console": "integratedTerminal",
             "justMyCode": true
         },
         {
             "name": "Python: Current File",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false,
+        },
+        {
+            "name": "Python venv shell",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "-i",
+            "console": "integratedTerminal",
+            // "args": ["-i"],
         }
     ]
 }
