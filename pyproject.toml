@@ -1,25 +1,31 @@
-[tool.poetry]
-name = "seastate"
-version = "0.1.2"
-description = "Collect ocean measurement data based on location and timeframe"
-authors = ["Ivo <ivorivetta@users.noreply.github.com>"]
-license = "MIT"
-readme = "README.md"
-repository = "https://github.com/ivorivetta/seastate"
-
-[tool.poetry.dependencies]
-python = ">=3.8,<4"
-defusedxml = "^0.7.1"
-numpy = "^1.23.1"
-requests = "^2.28.1"
-urllib3 = "^1.26.10"
-
-[tool.poetry.dev-dependencies]
-pandas = "^1.4.3"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.urls]
-"Bug Tracker" = "https://github.com/ivorivetta/seastate/issues"
+[project]
+name = "seastate"
+version = "0.2.0"
+authors = [{ name = "Ivo Rivetta", email = "ivo@ivorivetta.com" }]
+description = "Collect ocean measurements for location and timeframe. Integrates NDBC and TidesAndCurrents datasources."
+readme = "README.md"
+requires-python = ">=3.8.1"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = [
+    "ocean",
+    "tides",
+    "currents",
+    "ndbc",
+    "weather",
+    "forecast",
+    "marine",
+    "data",
+    "api",
+]
+
+[project.urls]
+Homepage = "https://github.com/ivorivetta/seastate"
+Issues = "https://github.com/ivorivetta/seastate/issues"

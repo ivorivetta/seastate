@@ -1,7 +1,8 @@
 import numpy as np
 
+
 def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """ Returns distance in km using haversine method
+    """Returns distance in km using haversine method
 
     Args:
         lat1 (float): Coordinate in decimal degrees
@@ -20,8 +21,8 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     dlon = lon2 - lon1
 
     # Haversine method for measuring distance on a sphere
-    a = np.sin(dlat/2.0)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2.0)**2
+    a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
     c = 2 * np.arcsin(np.sqrt(a))
-    
+
     km = 6367 * c
     return km

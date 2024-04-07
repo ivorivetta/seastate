@@ -5,28 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: api submodule",
-            "type": "python",
+            "name": "Python: Pytest",
+            "type": "debugpy",
             "request": "launch",
-            "module": "seastate.api.${fileBasenameNoExtension}",
+            "module": "pytest",
+            "args": ["tests"],
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": false
         },
-        {
-            "name": "Python: module debug",
-            "type": "python",
-            "request": "launch",
-            "module": "seastate.${fileBasenameNoExtension}",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-        }
     ]
 }
