@@ -1,9 +1,22 @@
 # Variables
+include .env
+export
+
 PACKAGE_NAME := seastate
-VERSION := 0.2.0rc1
+VERSION := 0.2.0
 
 # Targets
-.PHONY: install venv test build clean publish
+.PHONY: install test build clean publish-test publish-prod
+.PHONY: check-git-ready
+.PHONY: update-stations
+
+check-git-ready:
+	@if [ -z "$$(git status | grep -E 'not staged|Untracked')" ]; then \
+		echo "Git is clean"; \
+	else \
+		echo "Git is dirty"; \
+		exit 1; \
+	fi
 
 install:
 	deactivate || true
@@ -24,12 +37,15 @@ build: clean
 	venv/bin/python -m pip install --upgrade build
 	venv/bin/python -m build
 
-publish-test:
+publish-test: build
 	venv/bin/python -m pip install --upgrade twine
 	venv/bin/python -m twine upload --repository testpypi -u __token__ -p ${PYPI_TEST_TOKEN} dist/*
 
-publish-prod:
-	twine upload -u __token__ -p ${PYPI_TOKEN} dist/*
+publish-prod: build check-git-ready
+	git commit -m "Release ${VERSION}"
+	venv/bin/python -m pip install --upgrade twine
+	venv/bin/python -m twine upload -u __token__ -p ${PYPI_TOKEN} dist/*
+
 clean:
 	rm -rf build dist *.egg-info
 
