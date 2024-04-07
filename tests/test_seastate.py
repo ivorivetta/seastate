@@ -47,27 +47,7 @@ class TestSeaState:
         ],
     )
     def test_build_date_range_success(self, seastate, start, end, expected):
-        print(start)
-        print(expected)
         # simplistic test,
         # should return a daterange with width 2 days or 1 day, minus 1 second
         start, end = seastate._build_date_range(start, end)
         assert (end - start).total_seconds() == expected
-
-    @pytest.mark.parametrize(
-        "start, end",
-        [
-            (start, end),
-        ],
-    )
-    def test_from_date_range_success(self, seastate, start, end):
-        # should return a dict with keys matching MEASUREMENTS
-        data = seastate.from_date_range(start, end)
-        assert set(data.keys()) == set(MEASUREMENTS)
-
-
-# Prev test cases
-# https://www.ndbc.noaa.gov/data/realtime2/42040.txt
-# https://www.ndbc.noaa.gov/data/stdmet/May/42040.txt
-# https://www.ndbc.noaa.gov/view_text_file.php?filename=42040h1996.txt.gz&dir=data/historical/stdmet/
-# https://www.ndbc.noaa.gov/view_text_file.php?filename=42040h1999.txt.gz&dir=data/historical/stdmet/

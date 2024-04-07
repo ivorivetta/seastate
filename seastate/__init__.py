@@ -74,7 +74,7 @@ class SeaState:
         for measurement in MEASUREMENTS:
             self._set_mediator(measurement)
 
-    def _get_data(self, key: str, start: datetime, end: datetime) -> Dict:
+    def _get_data(self, key: str, start: datetime, end: datetime) -> list[Dict]:
         mediator = self._get_mediator(key)
         data = {}
         data = mediator.api.measurement_from_date_range(

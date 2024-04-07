@@ -5,7 +5,6 @@ UML/
 *_cache
 todo.*
 *.old
-venv_test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

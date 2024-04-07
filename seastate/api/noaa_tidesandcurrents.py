@@ -63,7 +63,7 @@ class TidesAndCurrentsApi(BaseApi):
 
     def _parse_result(
         self, result: list[Result], start: datetime, end: datetime, measurement: str
-    ) -> Dict:
+    ) -> list[Dict]:
         # unpack to return specified measurement
         # since TidesAndCurrents returns 1 product per endpoint:
         # -> minimal parsing, just unpack Json
@@ -75,13 +75,20 @@ class TidesAndCurrentsApi(BaseApi):
             )
         try:
             parse_key = self._build_parse_key(measurement)
+            if result[0].data.get("error"):
+                self._logger.error("TidesAndCurrentsApi error, returning empty data")
+                self._logger.error(f"{measurement}:{result[0].data}")
+                return []
             data = result[0].data[parse_key]
         except KeyError as e:
             self._logger.exception(result.data)
             raise SeaStateException("TidesAndCurrentsApi unpacking error") from e
 
         if len(data) == 0:
-            raise SeaStateException("No data retrieved")
+            self._logger.warning(
+                f"No {measurement} data recovered for daterange:\
+                    {str(start.date())} : {str(end.date())}"
+            )
 
         return data
 

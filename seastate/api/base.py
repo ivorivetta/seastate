@@ -21,7 +21,7 @@ class BaseApi(ABC):
 
     def measurement_from_date_range(
         self, measurement: str, station_id: str, start: datetime, end: datetime
-    ) -> Dict:
+    ) -> list[Dict]:
         # build endpoint
         ep, ep_params = self._build_endpoint(measurement, station_id, start, end)
         # get result

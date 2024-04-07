@@ -91,7 +91,7 @@ class NdbcApi(BaseApi):
 
     def _parse_result(
         self, result: list[Result], start: datetime, end: datetime, measurement: str
-    ) -> Dict:
+    ) -> list[Dict]:
         # unpack list of results to text
         tmp = ""
         for res in result:
