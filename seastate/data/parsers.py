@@ -51,7 +51,7 @@ class StationParser:
 
             # skip corrupted lines
             if len(line) != 22:
-                self._logger.info("No station info in this line: " + str(line))
+                self._logger.info(f"No station info in this line: {str(line)}")
                 continue
 
             # parse stationID, gps, and confirm active measurement sources
@@ -106,8 +106,8 @@ class StationParser:
                 )
                 tmp_station["api"] = TidesAndCurrentsApi().id
             except IndexError as e:
-                # Faulty station, skip station node
-                self._logger.warn(e + str(line))
+                # Faulty tides and currents station, skip station row
+                self._logger.warn(f"{e}: {str(line)}")
                 continue
 
             # separate loop to parse individual measurements
