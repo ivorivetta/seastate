@@ -9,7 +9,9 @@ from seastate.models import Result
 
 
 class RestAdapter:
-    session = CachedSession("seastate_cache", backend="filesystem", use_cache_dir=True)
+    session = CachedSession(
+        "seastate_cache", backend="filesystem", use_cache_dir=True, expire_after=59
+    )
 
     def __init__(
         self,
