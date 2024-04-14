@@ -102,29 +102,16 @@ class SeaState:
         # makes an api call for each measurement,
         # the idea is that a cache with 59 second expiration
         # absorbs the duplicated endpoint calls during a single method call
-        # and the actual data is small so it's ok to reprocess in dict comp
-        data = {
-            key: self._measurement_from_date_range(key, start, end)
-            for key in self._requested_measurements
-        }
+        data = {}
+        for key in self._requested_measurements:
+            try:
+                data[key] = self._measurement_from_date_range(key, start, end)
+            except Exception as e:
+                self._logger.error(
+                    f"Error occurred while retrieving data for measurement {key}: {str(e)}"
+                )
+                data[key] = []
 
-        # previously, i manually built a dict with 7 api calls
-        # for each measurement
-        # get attribute.api
-        # call api.from_date_range on measurement, station, start, end
-        # gets measurement again
-        # gets staion again
-        # data = {}
-        # for measurement_key in MEASUREMENTS:
-        #     # access the configured api to generate response with hourly method
-        #     data[measurement_key] = self.__getattribute__(
-        #         measurement_key
-        #     ).api._measurement_from_date_range(
-        #         measurement=self.__getattribute__(measurement_key).measurement,
-        #         station_id=self.__getattribute__(measurement_key).station.id,
-        #         start=start,
-        #         end=end,
-        #     )
         return data
 
     def hourly(
