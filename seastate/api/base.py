@@ -19,7 +19,7 @@ class BaseApi(ABC):
             raise SeaStateException(f"API filename {id} does not match DATASOURCES")
         return id
 
-    def measurement_from_date_range(
+    def _measurement_from_date_range(
         self, measurement: str, station_id: str, start: datetime, end: datetime
     ) -> list[Dict]:
         # build endpoint

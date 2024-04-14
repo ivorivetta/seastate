@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "seastate"
-version = "0.2.0"
+version = "0.2.1"
 authors = [{ name = "Ivo Rivetta", email = "ivo@ivorivetta.com" }]
 description = "Collect ocean measurements for location and timeframe. Integrates NDBC and TidesAndCurrents datasources."
 readme = "README.md"
@@ -18,7 +18,10 @@ keywords = [
     "ocean",
     "tides",
     "currents",
+    "wind",
+    "temperature",
     "ndbc",
+    "noaa",
     "weather",
     "forecast",
     "marine",

@@ -9,7 +9,9 @@ from seastate.models import Result
 
 
 class RestAdapter:
-    session = CachedSession("seastate_cache", backend="filesystem", use_cache_dir=True)
+    session = CachedSession(
+        "seastate_cache", backend="filesystem", use_cache_dir=True, expire_after=59
+    )
 
     def __init__(
         self,
@@ -51,7 +53,9 @@ class RestAdapter:
         """
         full_url = self.url + endpoint
         headers = {"x-api-key": self._api_key}
-        log_line_pre = f"method={http_method}, url={full_url}, params={ep_params}"
+        log_line_pre = (
+            f"request: method={http_method}, url={full_url}, params={ep_params}"
+        )
         log_line_post = "result: success={}, status_code={}, message={}"
         # Log HTTP params and try HTTP request
         try:
@@ -92,9 +96,12 @@ class RestAdapter:
         # if status code in 200-299 range, return Result, else raise exception
         if is_success:
             self._logger.debug(msg=log_line)
+            self._logger.debug(msg=log_line_pre)
             return Result(response.status_code, message=response.reason, data=data_out)
+        # else, error has occured
+        log_line += f"\n{log_line_pre}"  # enrich error msg
         self._logger.error(msg=log_line)
-        raise SeaStateException(f"{response.status_code}: {response.reason}")
+        raise SeaStateException(log_line)
 
     def get(self, endpoint: str, ep_params: Union[Dict, None] = None) -> Result:
         """GET method for RestAdapter

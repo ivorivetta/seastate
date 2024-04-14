@@ -75,13 +75,17 @@ class TidesAndCurrentsApi(BaseApi):
             )
         try:
             parse_key = self._build_parse_key(measurement)
+            # checking payload for error message first
             if result[0].data.get("error"):
-                self._logger.error("TidesAndCurrentsApi error, returning empty data")
-                self._logger.error(f"{measurement}:{result[0].data}")
+                self._logger.error(
+                    f"TidesAndCurrentsApi error, returning empty data\n{measurement}:{result[0].data}"
+                )
                 return []
+            # parsing
             data = result[0].data[parse_key]
         except KeyError as e:
-            self._logger.exception(result.data)
+            msg = f"{e} unpacking {measurement} with key: {parse_key}\n{result[0].data}"
+            self._logger.error(msg=msg)
             raise SeaStateException("TidesAndCurrentsApi unpacking error") from e
 
         if len(data) == 0:
@@ -91,11 +95,3 @@ class TidesAndCurrentsApi(BaseApi):
             )
 
         return data
-
-
-if __name__ == "__main__":
-    api = TidesAndCurrentsApi()
-    result = api.hourly("wind", 9410230, datetime.today(), datetime.today())
-    print(result)
-    result = api.hourly(9410230, datetime.today(), datetime.today(), "air_temp")
-    result = api.hourly(9410230, datetime.today(), datetime.today(), "water_temp")
