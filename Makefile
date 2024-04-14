@@ -3,7 +3,7 @@ include .env
 export
 
 PACKAGE_NAME := seastate
-VERSION := 0.2.1rc1
+VERSION := 0.2.1
 
 # Targets
 .PHONY: install test build clean publish-test publish-prod
