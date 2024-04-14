@@ -52,7 +52,10 @@ class SeaState:
 
         # log warning if end is before start
         if end < start:
-            self._logger.warning("end is after start")
+            self._logger.warning("end is after start, swapping values")
+            buffer = end
+            end = start
+            start = buffer
 
         return start, end
 
