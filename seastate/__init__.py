@@ -77,10 +77,12 @@ class SeaState:
         for measurement in MEASUREMENTS:
             self._set_mediator(measurement)
 
-    def _get_data(self, key: str, start: datetime, end: datetime) -> list[Dict]:
+    def _measurement_from_date_range(
+        self, key: str, start: datetime, end: datetime
+    ) -> list[Dict]:
         mediator = self._get_mediator(key)
         data = {}
-        data = mediator.api.measurement_from_date_range(
+        data = mediator.api._measurement_from_date_range(
             measurement=mediator.measurement,
             station_id=mediator.station.id,
             start=start,
@@ -97,10 +99,12 @@ class SeaState:
         start, end = self._build_date_range(start, end)
 
         # makes an api call for each measurement,
-        # the idea is that the cache absorbs duplicate calls
-        # and the actual data is small so it's ok to reprocess
+        # the idea is that a cache with 59 second expiration
+        # absorbs the duplicated endpoint calls during a single method call
+        # and the actual data is small so it's ok to reprocess in dict comp
         data = {
-            key: self._get_data(key, start, end) for key in self._requested_measurements
+            key: self._measurement_from_date_range(key, start, end)
+            for key in self._requested_measurements
         }
 
         # previously, i manually built a dict with 7 api calls
@@ -114,7 +118,7 @@ class SeaState:
         #     # access the configured api to generate response with hourly method
         #     data[measurement_key] = self.__getattribute__(
         #         measurement_key
-        #     ).api.measurement_from_date_range(
+        #     ).api._measurement_from_date_range(
         #         measurement=self.__getattribute__(measurement_key).measurement,
         #         station_id=self.__getattribute__(measurement_key).station.id,
         #         start=start,
